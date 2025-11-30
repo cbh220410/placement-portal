@@ -1,74 +1,133 @@
-/* This file should be named src/pages/Employer/InterviewSchedulerPage.module.css */
 .pageContainer {
   min-height: 100vh;
-  background-color: #f0f2f5;
-  font-family: Arial, sans-serif;
-  color: #333;
+  background: var(--page-bg);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-primary);
+  position: relative;
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.pageContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
 }
 
 .contentContainer {
-  padding: 20px;
+  padding: 60px 20px;
   max-width: 800px;
   margin: auto;
+  position: relative;
+  z-index: 1;
 }
 
 .mainHeading {
-  margin-top: 20px;
-  font-size: 28px;
-  color: #333;
+  font-size: 36px;
+  font-weight: 800;
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 20px 0 30px;
+  border-left: 6px solid var(--accent-blue);
+  padding-left: 15px;
+  letter-spacing: -0.5px;
 }
 
 .schedulerCard {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  margin-top: 20px;
+  background: var(--card-bg);
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-primary);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.schedulerCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  transition: left 0.5s;
+  pointer-events: none;
+}
+
+.schedulerCard:hover::before {
+  left: 100%;
 }
 
 .cardHeading {
-  margin-top: 0;
-  color: #007bff;
+  margin: 0 0 16px;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 
 .slotsGrid {
   display: grid;
-  gap: 15px;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
 }
 
 .slotCard {
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: white;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid var(--border-primary);
   cursor: pointer;
-  transition: background-color 0.2s;
-  text-align: center;
-}
-
-.slotCard:hover {
-  background-color: #eaf2ff;
-}
-
-.selectedSlot {
-  border-color: #007bff;
-  background-color: #eaf2ff;
+  transition: all 0.3s ease;
 }
 
 .slotDate {
-  font-weight: bold;
-  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
 .slotTime {
-  margin: 0;
-  color: #666;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.slotCard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--hover-shadow);
+}
+
+.selectedSlot {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5);
 }
 
 .confirmationText {
-  margin-top: 20px;
-  text-align: center;
-  font-weight: bold;
-  color: #28a745;
+  margin-top: 18px;
+  font-size: 0.95rem;
+  color: var(--accent-blue);
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .contentContainer {
+    padding: 40px 15px;
+  }
+
+  .mainHeading {
+    font-size: 30px;
+  }
+
+  .schedulerCard {
+    padding: 22px;
+  }
 }

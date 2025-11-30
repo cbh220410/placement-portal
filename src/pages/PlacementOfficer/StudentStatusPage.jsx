@@ -1,96 +1,116 @@
-import React, { useState } from 'react';
-import OfficerNavbar from './OfficerNavbar';
-import styles from './StudentStatusPage.module.css';
-
-const initialStudents = [
-  { id: 1, name: 'Jane Doe', email: 'jane@example.com', branch: 'CSE', status: 'Unplaced', company: '-' },
-  { id: 2, name: 'John Smith', email: 'john@example.com', branch: 'ECE', status: 'Placed', company: 'Tech Sol' },
-  { id: 3, name: 'Ravi Sharma', email: 'ravi@example.com', branch: 'CSE', status: 'Unplaced', company: '-' },
-  { id: 4, name: 'Emily White', email: 'emily@example.com', branch: 'IT', status: 'Placed', company: 'Acme Corp' },
-  { id: 5, name: 'Michael Brown', email: 'michael@example.com', branch: 'MECH', status: 'Unplaced', company: '-' },
-];
+// src/pages/PlacementOfficer/StudentStatusPage.jsx
+import React, { useEffect, useState } from "react";
+import OfficerNavbar from "./OfficerNavbar";
+import { getTable, updateRow } from "../../storage/db";
+import styles from "./StudentStatusPage.module.css";
 
 const StudentStatusPage = () => {
-  const [students, setStudents] = useState(initialStudents);
-  const [filter, setFilter] = useState('All');
+  const [students, setStudents] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [interviews, setInterviews] = useState([]);
+  const [filter, setFilter] = useState("All");
 
-  const handleStatusChange = (id, newStatus) => {
-    const updatedStudents = students.map(student => 
-      student.id === id ? { ...student, status: newStatus, company: newStatus === 'Unplaced' ? '-' : 'TBD' } : student
-    );
-    setStudents(updatedStudents);
+  useEffect(() => {
+    setStudents(getTable("users").filter(u => u.role === "student"));
+    setApplications(getTable("applications"));
+    setInterviews(getTable("interviews"));
+  }, []);
+
+  const handleStatusChange = (id, value) => {
+    updateRow("users", id, {
+      placementStatus: value,
+      placedCompany: value === "Placed" ? "TBD" : "-"
+    });
+
+    setStudents(getTable("users").filter(u => u.role === "student"));
   };
 
-  const handleCompanyChange = (id, newCompany) => {
-    const updatedStudents = students.map(student => 
-        student.id === id ? { ...student, company: newCompany } : student
-      );
-      setStudents(updatedStudents);
+  const handleCompanyChange = (id, value) => {
+    updateRow("users", id, { placedCompany: value });
+    setStudents(getTable("users").filter(u => u.role === "student"));
   };
 
-  const filteredStudents = filter === 'All' 
-    ? students 
-    : students.filter(s => s.status === filter);
+  const filtered = filter === "All"
+    ? students
+    : students.filter(s => s.placementStatus === filter);
 
   return (
     <div className={styles.pageContainer}>
       <OfficerNavbar />
       <div className={styles.contentContainer}>
         <h1 className={styles.mainHeading}>Student Placement Status</h1>
-        
+
         <div className={styles.filterSection}>
-            <label className={styles.filterLabel}>Filter by Status: </label>
-            <select onChange={(e) => setFilter(e.target.value)} className={styles.filterSelect}>
-                <option value="All">All Students</option>
-                <option value="Placed">Placed</option>
-                <option value="Unplaced">Unplaced</option>
-            </select>
+          <label className={styles.filterLabel}>Filter by Status: </label>
+          <select
+            onChange={(e) => setFilter(e.target.value)}
+            className={styles.filterSelect}
+          >
+            <option value="All">All Students</option>
+            <option value="Placed">Placed</option>
+            <option value="Unplaced">Unplaced</option>
+          </select>
         </div>
 
         <div className={styles.tableCard}>
-            <table className={styles.table}>
+          <table className={styles.table}>
             <thead>
-                <tr>
-                <th className={styles.th}>Name</th>
-                <th className={styles.th}>Branch</th>
-                <th className={styles.th}>Status</th>
-                <th className={styles.th}>Company</th>
-                </tr>
+              <tr>
+                <th>Name</th>
+                <th>Applications</th>
+                <th>Interviews</th>
+                <th>Status</th>
+                <th>Company</th>
+              </tr>
             </thead>
+
             <tbody>
-                {filteredStudents.map(student => (
-                <tr key={student.id} className={styles.tr}>
-                    <td className={styles.td}>
-                        <div className={styles.studentName}>{student.name}</div>
-                        <div className={styles.studentEmail}>{student.email}</div>
+              {filtered.map((s) => {
+                const apps = applications.filter(a => a.studentEmail === s.email);
+                const ints = interviews.filter(i => i.studentId == s.id);
+
+                return (
+                  <tr key={s.id}>
+                    <td>{s.name}<br /><span className={styles.email}>{s.email}</span></td>
+
+                    <td>
+                      {apps.length === 0 ? "—" : apps.map(a => (
+                        <div key={a.id}>{a.jobTitle} @ {a.company}</div>
+                      ))}
                     </td>
-                    <td className={styles.td}>{student.branch}</td>
-                    <td className={styles.td}>
-                        <select 
-                            value={student.status} 
-                            onChange={(e) => handleStatusChange(student.id, e.target.value)}
-                            className={`${styles.statusSelect} ${student.status === 'Placed' ? styles.placed : styles.unplaced}`}
-                        >
-                            <option value="Unplaced">Unplaced</option>
-                            <option value="Placed">Placed</option>
-                        </select>
+
+                    <td>
+                      {ints.length === 0 ? "—" : ints.map(i => (
+                        <div key={i.id}>
+                          {i.date} - {i.time}
+                        </div>
+                      ))}
                     </td>
-                    <td className={styles.td}>
-                        {student.status === 'Placed' ? (
-                             <input 
-                             type="text" 
-                             value={student.company}
-                             onChange={(e) => handleCompanyChange(student.id, e.target.value)}
-                             className={styles.companyInput}
-                           />
-                        ) : (
-                            <span>-</span>
-                        )}
+
+                    <td>
+                      <select
+                        value={s.placementStatus || "Unplaced"}
+                        onChange={(e) => handleStatusChange(s.id, e.target.value)}
+                      >
+                        <option value="Unplaced">Unplaced</option>
+                        <option value="Placed">Placed</option>
+                      </select>
                     </td>
-                </tr>
-                ))}
+
+                    <td>
+                      {s.placementStatus === "Placed" ? (
+                        <input
+                          value={s.placedCompany || ""}
+                          onChange={(e) => handleCompanyChange(s.id, e.target.value)}
+                        />
+                      ) : "—"}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
-            </table>
+
+          </table>
         </div>
       </div>
     </div>

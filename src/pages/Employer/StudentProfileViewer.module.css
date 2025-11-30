@@ -1,45 +1,233 @@
-/* This file should be named src/pages/Employer/StudentProfileViewer.module.css */
+/* =====================================
+   PAGE BASE STYLING
+   ===================================== */
 .pageContainer {
   min-height: 100vh;
-  background-color: #f0f2f5;
-  font-family: Arial, sans-serif;
-  color: #333;
+  background: var(--page-bg);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-primary);
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 40px;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
+.pageContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+}
+
+/* =====================================
+   CONTENT CONTAINER
+   ===================================== */
 .contentContainer {
-  padding: 20px;
-  max-width: 800px;
+  max-width: 1000px;
   margin: auto;
+  padding: 60px 20px;
+  position: relative;
+  z-index: 1;
 }
 
+/* =====================================
+   MAIN HEADING
+   ===================================== */
 .mainHeading {
-  margin-top: 20px;
-  font-size: 28px;
-  color: #333;
+  font-size: 42px;
+  font-weight: 800;
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: left;
+  border-left: 6px solid var(--accent-blue);
+  padding-left: 15px;
+  margin-bottom: 40px;
+  letter-spacing: -0.5px;
 }
 
+/* =====================================
+   PROFILE CARD
+   ===================================== */
 .profileCard {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  margin-top: 20px;
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  border-radius: 16px;
+  padding: 32px;
+  border: 1px solid var(--border-primary);
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
 }
 
+.profileCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+  transition: 0.5s;
+  pointer-events: none;
+}
+
+.profileCard:hover::before {
+  left: 100%;
+}
+
+.name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* =====================================
+   INFO TEXT
+   ===================================== */
 .infoText {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
   margin: 10px 0;
+  line-height: 1.6;
 }
 
-.link {
-  color: #007bff;
+.resumeLink {
+  color: var(--accent-blue);
   text-decoration: none;
+  font-weight: 600;
 }
 
-.link:hover {
+.resumeLink:hover {
   text-decoration: underline;
 }
 
+/* =====================================
+   APPLICATION CARD
+   ===================================== */
+.applicationCard,
+.applicationHistoryCard {
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  border-radius: 16px;
+  padding: 32px;
+  border: 1px solid var(--border-primary);
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.applicationCard::before,
+.applicationHistoryCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+  transition: 0.5s;
+  pointer-events: none;
+}
+
+.applicationCard:hover::before,
+.applicationHistoryCard:hover::before {
+  left: 100%;
+}
+
+/* =====================================
+   CARD HEADINGS
+   ===================================== */
+.cardHeading {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* =====================================
+   NO APPLICATIONS
+   ===================================== */
+.noApplications {
+  color: var(--text-muted);
+  font-size: 1rem;
+  padding: 12px 0;
+}
+
+/* =====================================
+   APPLICATION LIST
+   ===================================== */
+.appList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.appItem {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-primary);
+  position: relative;
+  transition: 0.3s;
+}
+
+.appItem:last-child {
+  border-bottom: none;
+}
+
+.appItem:hover {
+  background: rgba(96, 165, 250, 0.05);
+  border-left: 4px solid var(--accent-blue);
+  padding-left: 20px;
+}
+
+/* =====================================
+   NOT FOUND HEADING
+   ===================================== */
 .notFoundHeading {
   text-align: center;
-  margin-top: 50px;
+  margin-top: 120px;
+  font-size: 32px;
+  color: var(--text-muted);
+}
+
+/* =====================================
+   MEDIA QUERIES
+   ===================================== */
+@media (max-width: 768px) {
+  .contentContainer {
+    padding: 40px 15px;
+  }
+
+  .mainHeading {
+    font-size: 32px;
+  }
+
+  .profileCard,
+  .applicationCard,
+  .applicationHistoryCard {
+    padding: 24px;
+  }
 }

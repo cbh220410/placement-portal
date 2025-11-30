@@ -1,35 +1,51 @@
-// This file should be named src/pages/Employer/PostJobPage.jsx
-import React, { useState } from 'react';
-import EmployerNavbar from './EmployerNavbar';
-import styles from './PostJobPage.module.css';
+// src/pages/Employer/PostJobPage.jsx
+import React, { useState } from "react";
+import EmployerNavbar from "./EmployerNavbar";
+import { addRow } from "../../storage/db";
+import { useAuth } from "../../context/AuthContext";
+import styles from "./PostJobPage.module.css";
 
 const PostJobPage = () => {
+  const { user } = useAuth();
+
   const [jobDetails, setJobDetails] = useState({
-    title: '',
-    company: 'Acme Corp',
-    location: '',
-    description: '',
-    requirements: '',
+    title: "",
+    location: "",
+    description: "",
+    requirements: "",
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setJobDetails(prevDetails => ({
-      ...prevDetails,
-      [name]: value,
+    setJobDetails((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Job has been posted successfully!');
-    console.log('Job Posted:', jobDetails);
+
+    const newJob = {
+      id: Date.now(),
+      title: jobDetails.title,
+      company: user.name,
+      location: jobDetails.location,
+      description: jobDetails.description,
+      requirements: jobDetails.requirements,
+      employerEmail: user.email,
+      employerName: user.name,
+      createdAt: new Date().toISOString(),
+    };
+
+    addRow("jobs", newJob);
+
+    alert("Job posted successfully!");
+
     setJobDetails({
-      title: '',
-      company: 'Acme Corp',
-      location: '',
-      description: '',
-      requirements: '',
+      title: "",
+      location: "",
+      description: "",
+      requirements: "",
     });
   };
 
@@ -38,6 +54,7 @@ const PostJobPage = () => {
       <EmployerNavbar />
       <div className={styles.contentContainer}>
         <h1 className={styles.mainHeading}>Post a New Job</h1>
+
         <div className={styles.formCard}>
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formGroup}>
@@ -51,17 +68,17 @@ const PostJobPage = () => {
                 className={styles.input}
               />
             </div>
+
             <div className={styles.formGroup}>
               <label className={styles.label}>Company</label>
               <input
                 type="text"
-                name="company"
-                value={jobDetails.company}
-                onChange={handleChange}
+                value={user.name}
                 disabled
                 className={styles.input}
               />
             </div>
+
             <div className={styles.formGroup}>
               <label className={styles.label}>Location</label>
               <input
@@ -73,17 +90,19 @@ const PostJobPage = () => {
                 className={styles.input}
               />
             </div>
+
             <div className={styles.formGroup}>
               <label className={styles.label}>Job Description</label>
               <textarea
                 name="description"
                 value={jobDetails.description}
                 onChange={handleChange}
-                rows="5"
+                rows="4"
                 required
                 className={styles.input}
-              ></textarea>
+              />
             </div>
+
             <div className={styles.formGroup}>
               <label className={styles.label}>Requirements</label>
               <textarea
@@ -92,8 +111,9 @@ const PostJobPage = () => {
                 onChange={handleChange}
                 rows="3"
                 className={styles.input}
-              ></textarea>
+              />
             </div>
+
             <button type="submit" className={styles.button}>
               Post Job
             </button>

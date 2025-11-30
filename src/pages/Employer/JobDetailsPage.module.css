@@ -1,41 +1,84 @@
-/* This file should be named src/pages/Employer/JobDetailsPage.module.css */
 .pageContainer {
   min-height: 100vh;
-  background-color: #f0f2f5;
-  font-family: Arial, sans-serif;
-  color: #333;
+  background: var(--page-bg);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-primary);
+  position: relative;
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.pageContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
 }
 
 .contentContainer {
-  padding: 20px;
-  max-width: 800px;
+  padding: 60px 20px;
+  max-width: 1000px;
   margin: auto;
+  position: relative;
+  z-index: 1;
 }
 
 .mainHeading {
-  margin-top: 20px;
-  font-size: 28px;
-  color: #333;
+  font-size: 42px;
+  font-weight: 800;
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 20px 0 10px;
+  border-left: 6px solid var(--accent-blue);
+  padding-left: 15px;
+  letter-spacing: -0.5px;
+}
+
+.jobMeta {
+  color: var(--text-secondary);
+  margin-bottom: 16px;
 }
 
 .jobDescription {
-  color: #666;
-  font-size: 16px;
+  margin-bottom: 30px;
+  color: var(--text-secondary);
+  line-height: 1.6;
 }
 
 .applicationsHeading {
-  margin-top: 40px;
-  font-size: 24px;
-  color: #007bff;
+  font-size: 1.4rem;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.noApplications {
+  color: var(--text-muted);
 }
 
 .applicationsGrid {
   display: grid;
-  gap: 15px;
+  grid-template-columns: 1fr;
+  gap: 20px;
   margin-top: 20px;
 }
 
 .notFoundHeading {
   text-align: center;
-  margin-top: 50px;
+  margin-top: 60px;
+}
+
+/* responsiveness */
+@media (max-width: 768px) {
+  .contentContainer {
+    padding: 40px 15px;
+  }
+
+  .mainHeading {
+    font-size: 32px;
+  }
 }

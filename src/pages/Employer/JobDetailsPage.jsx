@@ -1,56 +1,41 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import EmployerNavbar from './EmployerNavbar';
-import ApplicationItem from './ApplicationItem';
-import { useAuth } from '../../context/AuthContext'; // <-- Import useAuth
-import styles from './JobDetailsPage.module.css';
-
-const jobData = {
-  '1': { 
-    title: 'Senior Developer', 
-    description: 'Lead our next big project.', 
-    // We will dynamically add the logged-in user to this list
-    applications: [
-      { id: 101, name: 'Jane Doe', status: 'In Review' },
-      { id: 102, name: 'John Smith', status: 'New' },
-      // Note: New Applicant (ID 999) will be inserted dynamically below
-    ]
-  },
-  '2': { 
-    title: 'UI/UX Designer', 
-    description: 'Create beautiful user interfaces.', 
-    applications: [
-      { id: 201, name: 'Emily White', status: 'Interview Scheduled' },
-      { id: 202, name: 'David Brown', status: 'In Review' },
-    ]
-  },
-};
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import EmployerNavbar from "./EmployerNavbar";
+import { getTable, updateRow } from "../../storage/db";
+import ApplicationItem from "./ApplicationItem";
+import styles from "./JobDetailsPage.module.css";
 
 const JobDetailsPage = () => {
   const { jobId } = useParams();
-  const { user } = useAuth(); // <-- Get the logged-in user
-  const job = jobData[jobId];
+  const [job, setJob] = useState(null);
+  const [applications, setApplications] = useState([]);
 
-  // --- CRITICAL FIX: Add the currently logged-in user as a NEW applicant ---
-  if (job && user.role === 'student') {
-      const isUserAlreadyListed = job.applications.some(app => app.id === user.email);
-      
-      if (!isUserAlreadyListed) {
-          job.applications.push({
-              id: user.email, // Use email as unique ID for simplicity
-              name: user.name,
-              status: 'Submitted',
-          });
-      }
-  }
-  // --- END CRITICAL FIX ---
+  // Load job + applications for this job
+  useEffect(() => {
+    const jobs = getTable("jobs");
+    const foundJob = jobs.find((j) => j.id === Number(jobId));
+    setJob(foundJob || null);
 
+    const allApps = getTable("applications");
+    const jobApps = allApps.filter((app) => app.jobId === Number(jobId));
+    setApplications(jobApps);
+  }, [jobId]);
+
+  // Called when status is changed in ApplicationItem
+  const handleStatusChange = (applicationId, newStatus) => {
+    updateRow("applications", applicationId, { status: newStatus });
+    const allApps = getTable("applications");
+    const jobApps = allApps.filter((app) => app.jobId === Number(jobId));
+    setApplications(jobApps);
+  };
 
   if (!job) {
     return (
       <div className={styles.pageContainer}>
         <EmployerNavbar />
-        <h1 className={styles.notFoundHeading}>Job not found!</h1>
+        <div className={styles.contentContainer}>
+          <h1 className={styles.notFoundHeading}>Job not found!</h1>
+        </div>
       </div>
     );
   }
@@ -60,14 +45,25 @@ const JobDetailsPage = () => {
       <EmployerNavbar />
       <div className={styles.contentContainer}>
         <h1 className={styles.mainHeading}>{job.title}</h1>
+        <p className={styles.jobMeta}>
+          <strong>{job.company}</strong> · {job.location}
+        </p>
         <p className={styles.jobDescription}>{job.description}</p>
 
-        <h2 className={styles.applicationsHeading}>Applications ({job.applications.length})</h2>
+        <h2 className={styles.applicationsHeading}>
+          Applications ({applications.length})
+        </h2>
+
+        {applications.length === 0 && (
+          <p className={styles.noApplications}>No applications yet.</p>
+        )}
+
         <div className={styles.applicationsGrid}>
-          {job.applications.map(app => (
-            <ApplicationItem 
-              key={app.id} 
-              application={app} 
+          {applications.map((app) => (
+            <ApplicationItem
+              key={app.id}
+              application={app}
+              onStatusChange={handleStatusChange}
             />
           ))}
         </div>

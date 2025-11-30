@@ -1,6 +1,8 @@
-import React from 'react';
+// src/pages/Student/StudentDashboard.jsx
+import React, { useEffect, useState } from 'react';
 import StudentNavbar from './StudentNavbar';
 import { useAuth } from '../../context/AuthContext';
+import { getApplications, getInterviews } from '../../utils/storage';
 import styles from './StudentDashboard.module.css';
 
 const getProfileCompletion = (profileData) => {
@@ -16,7 +18,9 @@ const getProfileCompletion = (profileData) => {
 
 const StudentDashboard = () => {
   const { user } = useAuth();
-  
+  const [applications, setApplications] = useState([]);
+  const [interviews, setInterviews] = useState([]);
+
   const profileData = {
     name: user.name,
     resume: 'resume.pdf',
@@ -25,17 +29,22 @@ const StudentDashboard = () => {
     experience: null,
   };
 
-  const applications = [
-    { id: 1, status: 'In Review' },
-    { id: 2, status: 'Interview Scheduled' },
-    { id: 3, status: 'Submitted' },
-    { id: 4, status: 'Rejected' },
-    { id: 5, status: 'Submitted' },
-  ];
-  
-  const totalApplications = applications.length;
-  const interviews = applications.filter(app => app.status === 'Interview Scheduled').length;
   const profileCompletion = getProfileCompletion(profileData);
+
+  useEffect(() => {
+    const allApps = getApplications().filter(
+      (app) => app.studentEmail === user.email
+    );
+    setApplications(allApps);
+
+    const allInterviews = getInterviews().filter(
+      (intv) => intv.studentEmail === user.email
+    );
+    setInterviews(allInterviews);
+  }, [user.email]);
+
+  const totalApplications = applications.length;
+  const interviewCount = interviews.length;
 
   return (
     <div className={styles.pageContainer}>
@@ -47,13 +56,13 @@ const StudentDashboard = () => {
           <div className={styles.card}>
             <h3 className={styles.cardHeading}>Profile Completion</h3>
             <div className={styles.progressBarContainer}>
-              <div 
+              <div
                 className={styles.progressBar}
                 style={{ width: `${profileCompletion}%` }}
               ></div>
             </div>
             <p className={styles.cardText}>
-              Your profile is **{profileCompletion}%** complete.
+              Your profile is <strong>{profileCompletion.toFixed(0)}%</strong> complete.
             </p>
           </div>
 
@@ -65,7 +74,7 @@ const StudentDashboard = () => {
                 <p className={styles.statLabel}>Jobs Applied</p>
               </div>
               <div>
-                <h4 className={styles.statNumber}>{interviews}</h4>
+                <h4 className={styles.statNumber}>{interviewCount}</h4>
                 <p className={styles.statLabel}>Interviews</p>
               </div>
             </div>
@@ -76,15 +85,21 @@ const StudentDashboard = () => {
           <h3 className={styles.cardHeading}>Your Next Steps</h3>
           <ul className={styles.actionList}>
             <li className={styles.actionItem}>
-              <p className={styles.actionText}>**Complete your profile.** Missing your work experience!</p>
+              <p className={styles.actionText}>
+                <strong>Complete your profile.</strong> Missing your work experience!
+              </p>
             </li>
-            {interviews > 0 && (
+            {interviewCount > 0 && (
               <li className={styles.actionItem}>
-                <p className={styles.actionText}>You have an upcoming interview!</p>
+                <p className={styles.actionText}>
+                  You have an upcoming interview!
+                </p>
               </li>
             )}
             <li className={styles.actionItem}>
-              <p className={styles.actionText}>**Explore more jobs** to increase your chances.</p>
+              <p className={styles.actionText}>
+                <strong>Explore more jobs</strong> to increase your chances.
+              </p>
             </li>
           </ul>
         </div>

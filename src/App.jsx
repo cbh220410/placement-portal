@@ -111,6 +111,16 @@ const App = () => {
             path="/officer/student-status"
             element={<PrivateRoute requiredRole="officer"><StudentStatusPage /></PrivateRoute>}
           />
+          <Route
+  path="/officer"
+  element={<PrivateRoute requiredRole="officer"><OfficerDashboard /></PrivateRoute>}
+/>
+
+<Route
+  path="/officer/student-status"
+  element={<PrivateRoute requiredRole="officer"><StudentStatusPage /></PrivateRoute>}
+/>
+
             {/* Catch-all for 404 pages */}
             <Route path="*" element={<h1>404: Page Not Found</h1>} />
           </Routes>

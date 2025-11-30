@@ -1,3 +1,4 @@
+// src/pages/public/SignupPage.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -11,41 +12,54 @@ const SignupPage = () => {
     password: '',
     role: 'student',
   });
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({ ...prevData, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // --- CRITICAL FIX: Save the newly created account data ---
-    const newUser = { ...formData, role: formData.role }; 
-    localStorage.setItem('NEW_SIGNUP_USER', JSON.stringify(newUser));
-    
-    alert(`Account created for ${newUser.name}! Please log in.`);
-    console.log('New user saved:', newUser);
-    
-    // Redirect to the login page
-    navigate('/login');
-  };
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: -20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+    // Build the new user object
+    const newUser = {
+      id: Date.now(), // simple unique id
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      role: formData.role, // student / employer / officer / admin
+    };
+
+    // Save a copy for your older login flow (if you still want it)
+    localStorage.setItem('NEW_SIGNUP_USER', JSON.stringify(newUser));
+
+    // 🔥 Save into global users list
+    try {
+      const stored = localStorage.getItem('users');
+      const users = stored ? JSON.parse(stored) : [];
+      users.push(newUser);
+      localStorage.setItem('users', JSON.stringify(users));
+    } catch (err) {
+      console.error('Error saving user list:', err);
+      localStorage.setItem('users', JSON.stringify([newUser]));
+    }
+
+    alert(`Account created for ${newUser.name} as ${newUser.role}. Please log in.`);
+    navigate('/login');
   };
 
   return (
     <div className={styles.container}>
       <motion.div
         className={styles.glassContainer}
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
         <h2 className={styles.heading}>Create a New Account</h2>
+
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.inputGroup}>
             <label htmlFor="name" className={styles.label}>Full Name</label>
@@ -60,6 +74,7 @@ const SignupPage = () => {
               className={styles.input}
             />
           </div>
+
           <div className={styles.inputGroup}>
             <label htmlFor="email" className={styles.label}>Email</label>
             <input
@@ -73,6 +88,7 @@ const SignupPage = () => {
               className={styles.input}
             />
           </div>
+
           <div className={styles.inputGroup}>
             <label htmlFor="password" className={styles.label}>Password</label>
             <input
@@ -86,6 +102,7 @@ const SignupPage = () => {
               className={styles.input}
             />
           </div>
+
           <div className={styles.inputGroup}>
             <label htmlFor="role" className={styles.label}>I am a...</label>
             <select
@@ -97,12 +114,16 @@ const SignupPage = () => {
             >
               <option value="student">Student</option>
               <option value="employer">Employer</option>
+              <option value="officer">Placement Officer</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
+
           <button type="submit" className={styles.button}>
             Sign Up
           </button>
         </form>
+
         <p className={styles.credentials}>
           Already have an account? <Link to="/login">Log In</Link>
         </p>
