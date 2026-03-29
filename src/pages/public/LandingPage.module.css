@@ -1,210 +1,213 @@
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  padding: 56px 20px;
+  background: var(--page-bg);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  padding: 40px 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  justify-content: center;
   position: relative;
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .container::before {
-  content: '';
+  content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #60a5fa, transparent);
+  inset: -20%;
+  background:
+    radial-gradient(circle at 14% 18%, rgba(59, 130, 246, 0.28) 0%, rgba(59, 130, 246, 0) 42%),
+    radial-gradient(circle at 88% 12%, rgba(14, 165, 233, 0.2) 0%, rgba(14, 165, 233, 0) 40%),
+    radial-gradient(circle at 62% 88%, rgba(168, 85, 247, 0.16) 0%, rgba(168, 85, 247, 0) 44%);
+  transform: translate3d(0, 0, 0);
+  animation: ambientFloat 18s ease-in-out infinite;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--landing-grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--landing-grid-color) 1px, transparent 1px),
+    radial-gradient(circle at center, transparent 28%, var(--landing-vignette));
+  background-size: 36px 36px, 36px 36px, auto;
+  background-position: center;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .mainHeading {
-  font-size: 56px;
+  margin: 0 0 10px;
+  font-size: clamp(2rem, 4vw, 2.9rem);
   font-weight: 800;
-  background: linear-gradient(135deg, #60a5fa, #a78bfa, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   text-align: center;
-  margin: 0 0 20px 0;
-  letter-spacing: -1px;
-  z-index: 10;
+  color: var(--text-primary);
+  position: relative;
+  z-index: 1;
 }
 
 .subHeading {
-  font-size: 18px;
-  color: rgba(226, 232, 240, 0.8);
+  margin: 0 0 34px;
+  max-width: 720px;
   text-align: center;
-  margin: 0 0 60px 0;
-  z-index: 10;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  position: relative;
+  z-index: 1;
 }
 
 .cardContainer {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  z-index: 10;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  gap: 16px;
+  position: relative;
+  z-index: 1;
 }
 
 .card {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.6));
-  border: 1px solid rgba(96, 165, 250, 0.2);
-  border-radius: 16px;
-  padding: 40px 30px;
-  box-shadow: 0 0 30px rgba(96, 165, 250, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 320px;
-  backdrop-filter: blur(10px);
+  background: var(--card-bg);
+  border: 1px solid var(--border-primary);
+  border-radius: 14px;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
   overflow: hidden;
 }
 
 .card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transition: left 0.5s;
-  pointer-events: none;
-}
-
-.card:hover::before {
-  left: 100%;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--role-accent), transparent);
+  opacity: 0.85;
 }
 
 .card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 50px rgba(96, 165, 250, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  border-color: rgba(96, 165, 250, 0.4);
+  transform: translateY(-3px);
+  box-shadow: var(--hover-shadow);
 }
 
 .cardLink {
-  text-decoration: none;
+  height: 100%;
+  padding: 22px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
-  position: relative;
-  z-index: 2;
+  gap: 16px;
+  text-decoration: none;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.roleLabel {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-primary);
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cardArrow {
+  color: var(--role-accent);
+  font-size: 1.06rem;
+  font-weight: 700;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
 }
 
 .cardHeading {
-  font-size: 32px;
-  font-weight: 800;
-  margin: 0 0 16px 0;
-  text-align: center;
-  color: white;
-  letter-spacing: -0.5px;
+  margin: 0;
+  color: var(--text-primary) !important;
+  font-size: 1.18rem;
+  font-weight: 700;
 }
 
 .cardText {
-  font-size: 16px;
-  color: rgba(203, 213, 225, 0.9);
-  text-align: center;
-  margin: 0 0 30px 0;
-  line-height: 1.6;
-  flex-grow: 1;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.cardFooter {
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
 .loginButton {
-  padding: 14px 40px;
-  color: white;
-  border: none;
+  width: fit-content;
+  padding: 8px 12px;
   border-radius: 8px;
+  border: 1px solid var(--role-accent);
+  background: transparent !important;
+  color: var(--role-accent);
+  font-size: 0.82rem;
   font-weight: 700;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-  display: inline-block;
-  align-self: center;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  position: relative;
-  overflow: hidden;
 }
 
-.loginButton::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-  z-index: -1;
-}
-
-.loginButton:hover::before {
-  width: 300px;
-  height: 300px;
-}
-
-.loginButton:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-}
-
-/* ===== RESPONSIVENESS ===== */
-
-@media (max-width: 1400px) {
-  .cardContainer {
-    grid-template-columns: repeat(2, 1fr);
+@keyframes ambientFloat {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0) scale(1.03);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding: 20px 15px;
-  }
+:global(:root[data-theme="light"]) {
+  --landing-grid-color: rgba(17, 24, 39, 0.05);
+  --landing-vignette: rgba(244, 246, 248, 0.78);
+}
 
-  .mainHeading {
-    font-size: 36px;
-  }
+:global(:root[data-theme="dark"]) {
+  --landing-grid-color: rgba(243, 244, 246, 0.05);
+  --landing-vignette: rgba(15, 17, 21, 0.62);
+}
 
-  .subHeading {
-    font-size: 16px;
-    margin-bottom: 40px;
-  }
-
+@media (max-width: 900px) {
   .cardContainer {
     grid-template-columns: 1fr;
-    gap: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 40px 14px;
   }
 
-  .card {
-    padding: 30px 20px;
-    min-height: 280px;
+  .cardLink {
+    padding: 18px;
   }
+}
 
-  .cardHeading {
-    font-size: 24px;
-  }
-
-  .cardText {
-    font-size: 14px;
-    margin-bottom: 20px;
-  }
-
-  .loginButton {
-    padding: 12px 30px;
-    font-size: 14px;
+@media (prefers-reduced-motion: reduce) {
+  .container::before {
+    animation: none;
   }
 }

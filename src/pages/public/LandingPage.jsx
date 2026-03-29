@@ -11,10 +11,10 @@ const LandingPage = () => {
   };
 
   const roles = [
-    { name: "Student", description: "Discover jobs and manage your applications.", route: "/login", color: "#007bff" },
-    { name: "Employer", description: "Post listings and find the best talent.", route: "/login", color: "#28a745" },
-    { name: "Admin", description: "Oversee the entire platform and user data.", route: "/login", color: "#dc3545" },
-    { name: "Placement Officer", description: "Track placement records and manage company interactions.", route: "/login", color: "#8e44ad" },
+    { name: "Student", description: "Discover jobs and manage your applications.", route: "/login", color: "#007bff", label: "Learner" },
+    { name: "Employer", description: "Post listings and find the best talent.", route: "/login", color: "#16a34a", label: "Recruiter" },
+    { name: "Admin", description: "Oversee the entire platform and user data.", route: "/login", color: "#dc2626", label: "Control" },
+    { name: "Placement Officer", description: "Track placement records and manage company interactions.", route: "/login", color: "#7c3aed", label: "Coordinator" },
   ];
 
   return (
@@ -28,6 +28,7 @@ const LandingPage = () => {
           <motion.div
             key={index}
             className={styles.card}
+            style={{ "--role-accent": role.color }}
             variants={cardVariants}
             initial="hidden"
             animate="visible"
@@ -35,9 +36,19 @@ const LandingPage = () => {
             transition={{ delay: index * 0.2 }}
           >
             <Link to={role.route} className={styles.cardLink}>
-              <h2 className={styles.cardHeading} style={{ color: role.color }}>{role.name}</h2>
-              <p className={styles.cardText}>{role.description}</p>
-              <div className={styles.loginButton} style={{ backgroundColor: role.color }}>Log In</div>
+              <div className={styles.cardTop}>
+                <span className={styles.roleLabel}>{role.label}</span>
+                <span className={styles.cardArrow}>→</span>
+              </div>
+
+              <div className={styles.cardBody}>
+                <h2 className={styles.cardHeading}>{role.name}</h2>
+                <p className={styles.cardText}>{role.description}</p>
+              </div>
+
+              <div className={styles.cardFooter}>
+                <div className={styles.loginButton}>Enter Portal</div>
+              </div>
             </Link>
           </motion.div>
         ))}
