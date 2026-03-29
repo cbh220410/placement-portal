@@ -1,5 +1,16 @@
 .pageContainer {
-  min-height: 100vh;
+  --portal-role: admin;
+  --accent-blue: #7c3aed;
+  --accent-purple: #a855f7;
+  --accent-pink: #d946ef;
+  --gradient-text: linear-gradient(135deg, #5b21b6, #9333ea);
+  --border-primary: rgba(124, 58, 237, 0.25);
+  --card-shadow: 0 8px 24px rgba(124, 58, 237, 0.1);
+  --hover-shadow: 0 14px 30px rgba(124, 58, 237, 0.18);
+  --focus-ring: rgba(124, 58, 237, 0.2);
+  --button-shadow: rgba(124, 58, 237, 0.22);
+  --button-shadow-hover: rgba(124, 58, 237, 0.32);
+   min-height: 100vh;
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #e2e8f0;
@@ -14,7 +25,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, #60a5fa, transparent);
+  background: linear-gradient(90deg, transparent, #a855f7, transparent);
 }
 
 .contentContainer {
@@ -28,12 +39,12 @@
 .mainHeading {
   font-size: 42px;
   font-weight: 800;
-  background: linear-gradient(135deg, #60a5fa, #a78bfa, #ec4899);
+  background: linear-gradient(135deg, #a855f7, #c084fc, #ec4899);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 20px 0 40px;
-  border-left: 6px solid #60a5fa;
+  border-left: 6px solid #a855f7;
   padding-left: 15px;
   letter-spacing: -0.5px;
 }
@@ -53,17 +64,17 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: linear-gradient(180deg, #60a5fa, #a78bfa, transparent);
+  background: linear-gradient(180deg, #a855f7, #c084fc, transparent);
 }
 
 .timelineEvent {
   padding: 24px 28px;
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.6));
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  border-left: 5px solid #60a5fa;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-left: 5px solid #a855f7;
   border-radius: 12px;
   box-shadow: 
-    0 0 20px rgba(96, 165, 250, 0.1),
+    0 0 20px rgba(168, 85, 247, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -80,9 +91,9 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  background: linear-gradient(135deg, #a855f7, #c084fc);
   border: 3px solid #1e293b;
-  box-shadow: 0 0 12px rgba(96, 165, 250, 0.6);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
 }
 
 /* Light sweep effect */
@@ -105,9 +116,9 @@
 
 .timelineEvent:hover {
   transform: translateX(8px) translateY(-4px);
-  border-left-color: #a78bfa;
+  border-left-color: #c084fc;
   box-shadow: 
-    0 12px 35px rgba(96, 165, 250, 0.2),
+    0 12px 35px rgba(168, 85, 247, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
@@ -171,7 +182,7 @@
   text-align: center;
   font-size: 28px;
   font-weight: 700;
-  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  background: linear-gradient(135deg, #a855f7, #c084fc);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -242,4 +253,43 @@
     font-size: 22px;
     margin-top: 50px;
   }
+}
+
+
+
+
+
+/* portal-landing-bg */
+.pageContainer {
+  background: var(--page-bg);
+  position: relative;
+  overflow-x: hidden;
+  isolation: isolate;
+}
+
+.pageContainer::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 14% 18%, var(--accent-blue) 0%, transparent 42%),
+    radial-gradient(circle at 88% 12%, var(--accent-purple) 0%, transparent 40%),
+    radial-gradient(circle at 62% 88%, var(--accent-pink, var(--accent-purple)) 0%, transparent 44%);
+  opacity: 0.16;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.pageContainer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border-primary) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-primary) 1px, transparent 1px);
+  background-size: 36px 36px, 36px 36px;
+  background-position: center;
+  opacity: 0.35;
+  z-index: -1;
+  pointer-events: none;
 }

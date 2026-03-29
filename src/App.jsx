@@ -24,6 +24,7 @@ import InterviewSchedulerPage from './pages/Employer/InterviewSchedulerPage.jsx'
 import JobAnalyticsPage from './pages/Employer/JobAnalyticsPage.jsx';
 import OfficerDashboard from './pages/PlacementOfficer/OfficerDashboard';
 import StudentStatusPage from './pages/PlacementOfficer/StudentStatusPage';
+import UserActivityTimelinePage from './pages/Admin/UserActivityTimelinePage';
 
 const App = () => {
   return (
@@ -102,6 +103,10 @@ const App = () => {
               path="/admin/anomalies"
               element={<PrivateRoute requiredRole="admin"><AnomalyDashboard /></PrivateRoute>}
             />
+            <Route
+              path="/admin/user-timeline/:userId"
+              element={<PrivateRoute requiredRole="admin"><UserActivityTimelinePage /></PrivateRoute>}
+            />
             {/* Protected Officer Routes */}
           <Route 
             path="/officer" 
@@ -111,15 +116,6 @@ const App = () => {
             path="/officer/student-status"
             element={<PrivateRoute requiredRole="officer"><StudentStatusPage /></PrivateRoute>}
           />
-          <Route
-  path="/officer"
-  element={<PrivateRoute requiredRole="officer"><OfficerDashboard /></PrivateRoute>}
-/>
-
-<Route
-  path="/officer/student-status"
-  element={<PrivateRoute requiredRole="officer"><StudentStatusPage /></PrivateRoute>}
-/>
 
             {/* Catch-all for 404 pages */}
             <Route path="*" element={<h1>404: Page Not Found</h1>} />

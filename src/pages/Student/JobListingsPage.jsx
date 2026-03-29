@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import StudentNavbar from "./StudentNavbar";
 import { getTable, addRow } from "../../storage/db";
 import { useAuth } from "../../context/AuthContext";
+import { applyToJob, fetchJobs, fetchStudentApplications, isBackendUnavailable } from "../../services/portalApi";
 import styles from "./JobListingsPage.module.css";
 
 const JobListingsPage = () => {
@@ -11,20 +12,55 @@ const JobListingsPage = () => {
   const [applications, setApplications] = useState([]);
 
   useEffect(() => {
-    setJobs(getTable("jobs"));
-    setApplications(getTable("applications"));
-  }, []);
+    const loadData = async () => {
+      try {
+        const [jobsData, applicationsData] = await Promise.all([
+          fetchJobs(),
+          fetchStudentApplications(user.email),
+        ]);
+        setJobs(jobsData);
+        setApplications(applicationsData);
+      } catch (error) {
+        if (!isBackendUnavailable(error)) {
+          console.error("Failed to load jobs from backend:", error);
+        }
+        setJobs(getTable("jobs"));
+        setApplications(
+          getTable("applications").filter((app) => app.studentEmail === user.email)
+        );
+      }
+    };
+
+    loadData();
+  }, [user.email]);
 
   const hasApplied = (jobId) => {
     return applications.some(
-      (app) => app.jobId === jobId && app.studentEmail === user.email
+      (app) => Number(app.jobId) === Number(jobId) && app.studentEmail === user.email
     );
   };
 
-  const handleApply = (job) => {
+  const handleApply = async (job) => {
     if (hasApplied(job.id)) {
       alert("You have already applied for this job.");
       return;
+    }
+
+    try {
+      const createdApplication = await applyToJob({
+        jobId: job.id,
+        studentId: user.id,
+        studentEmail: user.email,
+        studentName: user.name,
+      });
+      setApplications((prev) => [createdApplication, ...prev]);
+      alert(`Applied for ${job.title} at ${job.company}!`);
+      return;
+    } catch (error) {
+      if (!isBackendUnavailable(error)) {
+        alert(error.message || "Failed to apply for job");
+        return;
+      }
     }
 
     const application = {
@@ -39,8 +75,7 @@ const JobListingsPage = () => {
     };
 
     addRow("applications", application);
-    setApplications(getTable("applications"));
-
+    setApplications(getTable("applications").filter((app) => app.studentEmail === user.email));
     alert(`Applied for ${job.title} at ${job.company}!`);
   };
 
@@ -67,7 +102,7 @@ const JobListingsPage = () => {
 
                 {alreadyApplied ? (
                   <button className={styles.appliedButton} disabled>
-                    ✔ Applied
+                    Applied
                   </button>
                 ) : (
                   <button
@@ -87,3 +122,4 @@ const JobListingsPage = () => {
 };
 
 export default JobListingsPage;
+

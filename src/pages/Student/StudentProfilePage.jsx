@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import StudentNavbar from './StudentNavbar';
 import { useAuth } from '../../context/AuthContext'; // Import useAuth
+import { fetchUserByEmail, isBackendUnavailable, updateStudentProfile as updateStudentProfileApi } from '../../services/portalApi';
 import styles from './StudentProfilePage.module.css';
 
 const StudentProfilePage = () => {
@@ -14,6 +15,32 @@ const StudentProfilePage = () => {
     skills: 'React, JavaScript, CSS', // Default values for fields not on signup
     bio: 'Motivated student seeking opportunities in web development.',
   });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      setLoading(true);
+      try {
+        const backendProfile = await fetchUserByEmail(user.email);
+        setProfile((prev) => ({
+          ...prev,
+          name: backendProfile.name || prev.name,
+          email: backendProfile.email || prev.email,
+          skills: backendProfile.skills || prev.skills,
+          bio: backendProfile.bio || prev.bio,
+          resume: backendProfile.resume || prev.resume,
+        }));
+      } catch (error) {
+        if (!isBackendUnavailable(error)) {
+          console.error('Failed to load profile from backend:', error);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, [user.email]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,18 +53,34 @@ const StudentProfilePage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      if (user.id) {
+        await updateStudentProfileApi(user.id, {
+          name: profile.name,
+          skills: profile.skills,
+          bio: profile.bio,
+          resume: profile.resume,
+        });
+      }
+    } catch (error) {
+      if (!isBackendUnavailable(error)) {
+        alert(error.message || 'Failed to update profile');
+        return;
+      }
+    }
     alert('Profile updated successfully!');
     console.log('Profile saved:', profile);
-    // In a real app, you would send this updated profile data to the backend for this user.
   };
 
   return (
     <div className={styles.pageContainer}>
       <StudentNavbar />
       <div className={styles.contentContainer}>
-        <h1 className={styles.mainHeading}>My Profile</h1>
+        <h1 className={styles.mainHeading}>
+          My Profile {loading ? '(syncing...)' : ''}
+        </h1>
         <div className={styles.formCard}>
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formGroup}>

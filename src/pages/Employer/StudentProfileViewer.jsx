@@ -3,6 +3,11 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import EmployerNavbar from "./EmployerNavbar";
 import { getTable } from "../../storage/db";
+import {
+  fetchStudentApplications,
+  fetchUserByEmail,
+  isBackendUnavailable,
+} from "../../services/portalApi";
 import styles from "./StudentProfileViewer.module.css";
 
 const StudentProfileViewer = () => {
@@ -11,17 +16,36 @@ const StudentProfileViewer = () => {
   const [applications, setApplications] = useState([]);
 
   useEffect(() => {
-    // Load user details
-    const users = getTable("users");
-    const s = users.find((u) => String(u.id) === String(studentId));
-    setStudent(s);
+    const loadData = async () => {
+      const decodedStudentId = decodeURIComponent(studentId || "");
+      try {
+        const profile = await fetchUserByEmail(decodedStudentId);
+        setStudent(profile);
+        const apps = await fetchStudentApplications(profile.email);
+        setApplications(apps);
+        return;
+      } catch (error) {
+        if (!isBackendUnavailable(error)) {
+          console.error("Failed to load student profile from backend:", error);
+        }
+      }
 
-    // Load applications submitted by this student
-    const allApps = getTable("applications").filter(
-      (app) => String(app.studentId) === String(studentId)
-    );
+      const users = getTable("users");
+      const localStudent = users.find(
+        (u) =>
+          String(u.id) === String(studentId) ||
+          String(u.email).toLowerCase() === decodedStudentId.toLowerCase()
+      );
+      setStudent(localStudent || null);
 
-    setApplications(allApps);
+      const localApps = getTable("applications").filter(
+        (app) =>
+          String(app.studentEmail).toLowerCase() === decodedStudentId.toLowerCase()
+      );
+      setApplications(localApps);
+    };
+
+    loadData();
   }, [studentId]);
 
   if (!student) {
@@ -38,16 +62,13 @@ const StudentProfileViewer = () => {
       <EmployerNavbar />
 
       <div className={styles.contentContainer}>
-        <h1 className={styles.mainHeading}>
-          Viewing Profile: {student.name}
-        </h1>
+        <h1 className={styles.mainHeading}>Viewing Profile: {student.name}</h1>
 
-        {/* ---------------------------------------
-            STUDENT INFORMATION CARD
-        ----------------------------------------- */}
         <div className={styles.profileCard}>
           <h2 className={styles.name}>{student.name}</h2>
-          <p className={styles.infoText}><strong>Email:</strong> {student.email}</p>
+          <p className={styles.infoText}>
+            <strong>Email:</strong> {student.email}
+          </p>
           <p className={styles.infoText}>
             <strong>Skills:</strong> {student.skills || "Not provided"}
           </p>
@@ -72,9 +93,6 @@ const StudentProfileViewer = () => {
           </p>
         </div>
 
-        {/* ---------------------------------------
-            APPLICATION HISTORY SECTION
-        ----------------------------------------- */}
         <div className={styles.applicationHistoryCard}>
           <h2 className={styles.cardHeading}>Application History</h2>
 
@@ -84,9 +102,12 @@ const StudentProfileViewer = () => {
             <ul className={styles.appList}>
               {applications.map((app) => (
                 <li key={app.id} className={styles.appItem}>
-                  <strong>{app.jobTitle}</strong> — {app.status}
+                  <strong>{app.jobTitle}</strong> - {app.status}
                   <br />
-                  <small>Applied on: {new Date(app.date).toDateString()}</small>
+                  <small>
+                    Applied on:{" "}
+                    {new Date(app.appliedAt || app.date || Date.now()).toDateString()}
+                  </small>
                 </li>
               ))}
             </ul>

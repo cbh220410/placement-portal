@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import StudentNavbar from './StudentNavbar';
 import { useAuth } from '../../context/AuthContext';
 import { getApplications, getInterviews } from '../../utils/storage';
+import { fetchStudentApplications, fetchStudentInterviews, isBackendUnavailable } from '../../services/portalApi';
 import styles from './ApplicationsPage.module.css';
 
 const StudentApplicationsPage = () => {
@@ -10,22 +11,47 @@ const StudentApplicationsPage = () => {
   const [applications, setApplications] = useState([]);
 
   useEffect(() => {
-    const allApps = getApplications().filter(
-      (app) => app.studentEmail === user.email
-    );
-    const interviews = getInterviews();
+    const loadApplications = async () => {
+      try {
+        const [allApps, interviews] = await Promise.all([
+          fetchStudentApplications(user.email),
+          fetchStudentInterviews(user.email),
+        ]);
 
-    const merged = allApps.map((app) => {
-      const interview = interviews.find(
-        (intv) => intv.applicationId === app.id
+        const merged = allApps.map((app) => {
+          const interview = interviews.find(
+            (intv) => Number(intv.applicationId) === Number(app.id)
+          );
+          return {
+            ...app,
+            interviewTime: interview ? `${interview.date} at ${interview.time}` : null,
+          };
+        });
+        setApplications(merged);
+        return;
+      } catch (error) {
+        if (!isBackendUnavailable(error)) {
+          console.error('Failed loading applications from backend:', error);
+        }
+      }
+
+      const localApps = getApplications().filter(
+        (app) => app.studentEmail === user.email
       );
-      return {
-        ...app,
-        interviewTime: interview ? `${interview.date} at ${interview.time}` : null,
-      };
-    });
+      const localInterviews = getInterviews();
+      const merged = localApps.map((app) => {
+        const interview = localInterviews.find(
+          (intv) => Number(intv.applicationId) === Number(app.id)
+        );
+        return {
+          ...app,
+          interviewTime: interview ? `${interview.date} at ${interview.time}` : null,
+        };
+      });
+      setApplications(merged);
+    };
 
-    setApplications(merged);
+    loadApplications();
   }, [user.email]);
 
   return (

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import EmployerNavbar from "./EmployerNavbar";
 import { addRow } from "../../storage/db";
 import { useAuth } from "../../context/AuthContext";
+import { createJob, isBackendUnavailable } from "../../services/portalApi";
 import styles from "./PostJobPage.module.css";
 
 const PostJobPage = () => {
@@ -22,7 +23,7 @@ const PostJobPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newJob = {
@@ -37,7 +38,22 @@ const PostJobPage = () => {
       createdAt: new Date().toISOString(),
     };
 
-    addRow("jobs", newJob);
+    try {
+      await createJob({
+        title: jobDetails.title,
+        location: jobDetails.location,
+        description: jobDetails.description,
+        requirements: jobDetails.requirements,
+        employerEmail: user.email,
+        employerName: user.name,
+      });
+    } catch (error) {
+      if (!isBackendUnavailable(error)) {
+        alert(error.message || "Failed to post job");
+        return;
+      }
+      addRow("jobs", newJob);
+    }
 
     alert("Job posted successfully!");
 

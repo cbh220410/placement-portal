@@ -12,7 +12,7 @@ const FloatingThemeToggle = () => {
       title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
       aria-label="Toggle theme"
     >
-      {isDark ? '☀️' : '🌙'}
+      {isDark ? "\u2600\uFE0F" : "\uD83C\uDF19"}
     </button>
   );
 };

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminNavbar from './AdminNavbar';
+import { fetchAnomalies, isBackendUnavailable } from '../../services/portalApi';
 import styles from './AnomalyDashboard.module.css';
 
-const anomalies = [
+const defaultAnomalies = [
   { id: 1, type: 'High Application Rate', user: 'Jane Doe (Student)', details: 'Applied to 50 jobs in 1 hour.', severity: 'High' },
   { id: 2, type: 'Duplicate Job Posting', user: 'Acme Corp (Employer)', details: 'Posted the same "Senior Developer" job twice.', severity: 'Medium' },
   { id: 3, type: 'New Employer Alert', user: 'Tech Solutions Inc.', details: 'Joined the platform and immediately posted 10 jobs.', severity: 'Low' },
@@ -19,6 +20,30 @@ const getSeverityColor = (severity) => {
 };
 
 const AnomalyDashboard = () => {
+  const [anomalies, setAnomalies] = useState(defaultAnomalies);
+
+  useEffect(() => {
+    const loadAnomalies = async () => {
+      try {
+        const data = await fetchAnomalies();
+        if (Array.isArray(data) && data.length > 0) {
+          setAnomalies(
+            data.map((item, index) => ({
+              id: index + 1,
+              ...item,
+            }))
+          );
+        }
+      } catch (error) {
+        if (!isBackendUnavailable(error)) {
+          console.error('Failed loading anomalies from backend:', error);
+        }
+      }
+    };
+
+    loadAnomalies();
+  }, []);
+
   return (
     <div className={styles.pageContainer}>
       <AdminNavbar />
@@ -32,7 +57,7 @@ const AnomalyDashboard = () => {
                 <h3 className={styles.anomalyType}>{anomaly.type}</h3>
                 <span className={styles.anomalySeverity} style={{ color: getSeverityColor(anomaly.severity) }}>{anomaly.severity}</span>
               </div>
-              <p className={styles.anomalyUser}>**User:** {anomaly.user}</p>
+              <p className={styles.anomalyUser}>User: {anomaly.user}</p>
               <p className={styles.anomalyDetails}>{anomaly.details}</p>
             </div>
           ))}

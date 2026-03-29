@@ -1,5 +1,20 @@
 .pageContainer {
-  min-height: 100vh;
+  --portal-role: employer;
+  --accent-blue: #15803d;
+  --accent-purple: #22c55e;
+  --accent-pink: #65a30d;
+  --gradient-text: linear-gradient(135deg, #14532d, #16a34a);
+  --border-primary: rgba(21, 128, 61, 0.24);
+  --card-shadow: 0 8px 24px rgba(21, 128, 61, 0.1);
+  --hover-shadow: 0 14px 30px rgba(21, 128, 61, 0.18);
+  --focus-ring: rgba(21, 128, 61, 0.2);
+  --button-shadow: rgba(21, 128, 61, 0.2);
+  --button-shadow-hover: rgba(21, 128, 61, 0.3);
+  --table-header-bg: rgba(21, 128, 61, 0.12);
+  --table-row-alt: rgba(21, 128, 61, 0.04);
+  --table-row-hover: rgba(21, 128, 61, 0.1);
+  --chart-grid: rgba(21, 128, 61, 0.16);
+   min-height: 100vh;
   background: var(--page-bg);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text-primary);
@@ -81,4 +96,43 @@
   .mainHeading {
     font-size: 32px;
   }
+}
+
+
+
+
+
+/* portal-landing-bg */
+.pageContainer {
+  background: var(--page-bg);
+  position: relative;
+  overflow-x: hidden;
+  isolation: isolate;
+}
+
+.pageContainer::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 14% 18%, var(--accent-blue) 0%, transparent 42%),
+    radial-gradient(circle at 88% 12%, var(--accent-purple) 0%, transparent 40%),
+    radial-gradient(circle at 62% 88%, var(--accent-pink, var(--accent-purple)) 0%, transparent 44%);
+  opacity: 0.16;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.pageContainer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border-primary) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-primary) 1px, transparent 1px);
+  background-size: 36px 36px, 36px 36px;
+  background-position: center;
+  opacity: 0.35;
+  z-index: -1;
+  pointer-events: none;
 }

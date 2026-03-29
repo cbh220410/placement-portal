@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
+import { loginUser } from '../../services/authApi';
 import styles from './LoginPage.module.css';
 import FloatingThemeToggle from '../../components/FloatingThemeToggle';
 
@@ -18,18 +19,16 @@ const LoginPage = () => {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
+  const findLegacyUser = () => {
     let user = null;
 
-    // 1. Hardcoded demo users
     user = HARDCODED_USERS.find(
       (u) => u.email === email && u.password === password
     );
 
-    // 2. Check users saved from signup in localStorage
     if (!user) {
       try {
         const stored = localStorage.getItem('users');
@@ -44,7 +43,6 @@ const LoginPage = () => {
       }
     }
 
-    // 3. Fallback: legacy NEW_SIGNUP_USER (optional)
     if (!user) {
       const storedSignup = localStorage.getItem('NEW_SIGNUP_USER');
       if (storedSignup) {
@@ -54,12 +52,34 @@ const LoginPage = () => {
         }
       }
     }
+    return user;
+  };
 
-    if (user) {
-      login(user);
-    } else {
-      alert('Invalid credentials!');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage('');
+    setIsSubmitting(true);
+
+    try {
+      const response = await loginUser({ email, password });
+      login({
+        id: response.id,
+        name: response.name,
+        email: response.email,
+        role: response.role,
+      });
+      return;
+    } catch (apiError) {
+      const legacyUser = findLegacyUser();
+      if (legacyUser) {
+        login(legacyUser);
+        return;
+      }
+      setErrorMessage(apiError.message || 'Invalid credentials');
+    } finally {
+      setIsSubmitting(false);
     }
+
   };
 
   return (
@@ -99,8 +119,10 @@ const LoginPage = () => {
             />
           </div>
 
-          <button type="submit" className={styles.button}>
-            Login
+          {errorMessage ? <p className={styles.error}>{errorMessage}</p> : null}
+
+          <button type="submit" className={styles.button} disabled={isSubmitting}>
+            {isSubmitting ? 'Logging in...' : 'Login'}
           </button>
         </form>
 

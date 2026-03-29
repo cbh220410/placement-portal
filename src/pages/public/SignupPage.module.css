@@ -1,100 +1,144 @@
 .container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #e0ecff 0%, #c9e7ff 50%, #b8e3ff 100%);
-  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--auth-bg);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  background:
+    radial-gradient(circle at 12% 18%, var(--auth-glow-one) 0%, transparent 42%),
+    radial-gradient(circle at 84% 12%, var(--auth-glow-two) 0%, transparent 40%);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .glassContainer {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 40px 50px;
-  border-radius: 18px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
-  text-align: center;
+  max-width: 450px;
+  background: var(--auth-card-bg);
+  border: 1px solid var(--auth-border);
+  border-radius: 14px;
+  box-shadow: var(--auth-shadow);
+  padding: 28px 24px;
   backdrop-filter: blur(8px);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.glassContainer:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
 }
 
 .heading {
-  font-size: 26px;
+  margin: 0 0 18px;
+  font-size: 1.45rem;
   font-weight: 700;
-  color: #1e2a4a;
-  margin-bottom: 20px;
+  color: var(--text-primary);
+  text-align: left;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  text-align: left;
+  gap: 14px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .label {
-  font-size: 14px;
+  font-size: 0.83rem;
   font-weight: 600;
-  color: #1e2a4a;
-  margin-bottom: 5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .input,
 .select {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #d0d7e2;
+  padding: 10px 12px;
+  border: 1px solid var(--auth-input-border);
   border-radius: 8px;
-  background-color: #fff;
-  font-size: 14px;
-  color: #333;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background: var(--auth-input-bg);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .input:focus,
 .select:focus {
   outline: none;
-  border-color: #5a9bff;
-  box-shadow: 0 0 0 3px rgba(90, 155, 255, 0.25);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .button {
   width: 100%;
-  padding: 12px;
-  background: linear-gradient(90deg, #3b82f6, #06b6d4);
-  color: white;
-  font-weight: 600;
-  font-size: 16px;
   border: none;
   border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
+  background: var(--accent-blue);
+  color: #ffffff;
 }
 
 .button:hover {
-  background: linear-gradient(90deg, #2563eb, #0891b2);
-  transform: translateY(-1px);
+  filter: brightness(0.95);
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.error {
+  margin: 0;
+  color: #dc2626;
+  font-size: 0.86rem;
+  font-weight: 600;
 }
 
 .credentials {
-  margin-top: 20px;
-  font-size: 14px;
-  color: #4b5563;
+  margin: 16px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
   text-align: center;
 }
 
 .credentials a {
-  color: #2563eb;
   font-weight: 600;
-  text-decoration: none;
 }
 
-.credentials a:hover {
-  text-decoration: underline;
+:global(:root[data-theme='light']) {
+  --auth-bg: linear-gradient(135deg, #e6f4ff 0%, #d8efff 45%, #c8e8ff 100%);
+  --auth-card-bg: rgba(255, 255, 255, 0.9);
+  --auth-border: rgba(30, 144, 255, 0.22);
+  --auth-shadow: 0 14px 32px rgba(20, 84, 160, 0.14);
+  --auth-input-bg: #ffffff;
+  --auth-input-border: rgba(30, 111, 235, 0.24);
+  --auth-glow-one: rgba(30, 144, 255, 0.22);
+  --auth-glow-two: rgba(0, 191, 255, 0.16);
+}
+
+:global(:root[data-theme='dark']) {
+  --auth-bg: linear-gradient(160deg, #0d1426 0%, #13203a 48%, #0e182d 100%);
+  --auth-card-bg: rgba(18, 27, 44, 0.84);
+  --auth-border: rgba(125, 211, 252, 0.26);
+  --auth-shadow: 0 20px 44px rgba(2, 6, 23, 0.52);
+  --auth-input-bg: rgba(10, 16, 30, 0.88);
+  --auth-input-border: rgba(125, 211, 252, 0.24);
+  --auth-glow-one: rgba(59, 130, 246, 0.3);
+  --auth-glow-two: rgba(6, 182, 212, 0.2);
 }

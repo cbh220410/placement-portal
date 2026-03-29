@@ -29,8 +29,6 @@ const AdminNavbar = () => {
                         )}
                     </Link>
                 </li>
-                <li className={styles.navItem}><Link to="/admin/journey-map" className={styles.navLink}>Journey Map</Link></li>
-                
                 {/* THEME TOGGLE - NEW */}
                 <li className={styles.navItem}>
                     <button 
@@ -38,7 +36,7 @@ const AdminNavbar = () => {
                         className={styles.themeToggle} 
                         title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                     >
-                        {isDark ? '☀️' : '🌙'}
+                        {isDark ? "\u2600\uFE0F" : "\uD83C\uDF19"}
                     </button>
                 </li>
 
@@ -49,3 +47,4 @@ const AdminNavbar = () => {
 };
 
 export default AdminNavbar;
+

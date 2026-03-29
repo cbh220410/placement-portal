@@ -1,7 +1,18 @@
 /* =====================================
    PAGE BASE STYLING
    ===================================== */
-.pageContainer {
+  .pageContainer {
+  --portal-role: officer;
+  --accent-blue: #b45309;
+  --accent-purple: #d97706;
+  --accent-pink: #f59e0b;
+  --gradient-text: linear-gradient(135deg, #92400e, #d97706);
+  --border-primary: rgba(180, 83, 9, 0.24);
+  --card-shadow: 0 8px 24px rgba(180, 83, 9, 0.1);
+  --hover-shadow: 0 14px 30px rgba(180, 83, 9, 0.18);
+  --focus-ring: rgba(180, 83, 9, 0.2);
+  --button-shadow: rgba(180, 83, 9, 0.22);
+  --button-shadow-hover: rgba(180, 83, 9, 0.32);
   min-height: 100vh;
   background: var(--page-bg);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -87,7 +98,7 @@
 
 .filterSelect:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
 }
 
 /* =====================================
@@ -111,7 +122,7 @@
 }
 
 .th {
-  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(167, 139, 250, 0.2));
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.2), rgba(245, 158, 11, 0.2));
   color: var(--accent-blue);
   padding: 16px;
   font-weight: 700;
@@ -127,7 +138,7 @@
 }
 
 .tr:hover {
-  background: rgba(96, 165, 250, 0.1);
+  background: rgba(217, 119, 6, 0.1);
 }
 
 .tr:last-child {
@@ -148,7 +159,8 @@
   margin-bottom: 4px;
 }
 
-.studentEmail {
+.studentEmail,
+.email {
   font-size: 0.85rem;
   color: var(--text-muted);
 }
@@ -176,7 +188,7 @@
 
 .statusSelect:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
 }
 
 .statusSelect.placed {
@@ -204,7 +216,7 @@
 .companyInput:focus {
   outline: none;
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
 }
 
 /* =====================================
@@ -248,11 +260,11 @@
   --text-primary: #e2e8f0;
   --text-secondary: #cbd5e1;
   --text-muted: #94a3b8;
-  --border-primary: rgba(96, 165, 250, 0.3);
-  --gradient-text: linear-gradient(135deg, #60a5fa, #a78bfa, #ec4899);
-  --card-shadow: 0 0 30px rgba(96, 165, 250, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  --accent-blue: #60a5fa;
-  --accent-purple: #a78bfa;
+  --border-primary: rgba(217, 119, 6, 0.3);
+  --gradient-text: linear-gradient(135deg, #d97706, #f59e0b, #ec4899);
+  --card-shadow: 0 0 30px rgba(217, 119, 6, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --accent-blue: #d97706;
+  --accent-purple: #f59e0b;
   --input-bg: rgba(15, 23, 42, 0.4);
 }
 
@@ -263,10 +275,47 @@
   --text-primary: #1f2937;
   --text-secondary: #374151;
   --text-muted: #6b7280;
-  --border-primary: rgba(59, 130, 246, 0.2);
-  --gradient-text: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
-  --card-shadow: 0 0 20px rgba(59, 130, 246, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  --accent-blue: #3b82f6;
-  --accent-purple: #8b5cf6;
+  --border-primary: rgba(180, 83, 9, 0.2);
+  --gradient-text: linear-gradient(135deg, #b45309, #d97706, #ec4899);
+  --card-shadow: 0 0 20px rgba(180, 83, 9, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --accent-blue: #b45309;
+  --accent-purple: #d97706;
   --input-bg: rgba(255, 255, 255, 0.6);
+}
+
+
+
+/* portal-landing-bg */
+.pageContainer {
+  background: var(--page-bg);
+  position: relative;
+  overflow-x: hidden;
+  isolation: isolate;
+}
+
+.pageContainer::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 14% 18%, var(--accent-blue) 0%, transparent 42%),
+    radial-gradient(circle at 88% 12%, var(--accent-purple) 0%, transparent 40%),
+    radial-gradient(circle at 62% 88%, var(--accent-pink, var(--accent-purple)) 0%, transparent 44%);
+  opacity: 0.16;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.pageContainer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border-primary) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-primary) 1px, transparent 1px);
+  background-size: 36px 36px, 36px 36px;
+  background-position: center;
+  opacity: 0.35;
+  z-index: -1;
+  pointer-events: none;
 }

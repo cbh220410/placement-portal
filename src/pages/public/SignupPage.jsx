@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { signupUser } from '../../services/authApi';
 import styles from './SignupPage.module.css';
 import FloatingThemeToggle from '../../components/FloatingThemeToggle';
 
@@ -12,42 +13,65 @@ const SignupPage = () => {
     password: '',
     role: 'student',
   });
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Build the new user object
-    const newUser = {
-      id: Date.now(), // simple unique id
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-      role: formData.role, // student / employer / officer / admin
-    };
-
-    // Save a copy for your older login flow (if you still want it)
+  const saveLegacyUser = (newUser) => {
     localStorage.setItem('NEW_SIGNUP_USER', JSON.stringify(newUser));
-
-    // 🔥 Save into global users list
     try {
       const stored = localStorage.getItem('users');
       const users = stored ? JSON.parse(stored) : [];
       users.push(newUser);
       localStorage.setItem('users', JSON.stringify(users));
-    } catch (err) {
-      console.error('Error saving user list:', err);
+    } catch (error) {
+      console.error('Error saving user list:', error);
       localStorage.setItem('users', JSON.stringify([newUser]));
     }
+  };
 
-    alert(`Account created for ${newUser.name} as ${newUser.role}. Please log in.`);
-    navigate('/login');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage('');
+    setIsSubmitting(true);
+
+    const newUser = {
+      id: Date.now(),
+      name: formData.name.trim(),
+      email: formData.email.trim().toLowerCase(),
+      password: formData.password,
+      role: formData.role,
+    };
+
+    try {
+      await signupUser({
+        name: newUser.name,
+        email: newUser.email,
+        password: newUser.password,
+        role: newUser.role,
+      });
+      saveLegacyUser(newUser);
+      alert(`Account created for ${newUser.name} as ${newUser.role}. Please log in.`);
+      navigate('/login');
+      return;
+    } catch (apiError) {
+      const isNetworkError = apiError.message?.toLowerCase().includes('failed to fetch');
+      if (isNetworkError) {
+        saveLegacyUser(newUser);
+        alert('Backend not reachable. Account saved locally for demo mode.');
+        navigate('/login');
+        return;
+      }
+      setErrorMessage(apiError.message || 'Unable to create account');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -119,8 +143,10 @@ const SignupPage = () => {
             </select>
           </div>
 
-          <button type="submit" className={styles.button}>
-            Sign Up
+          {errorMessage ? <p className={styles.error}>{errorMessage}</p> : null}
+
+          <button type="submit" className={styles.button} disabled={isSubmitting}>
+            {isSubmitting ? 'Creating...' : 'Sign Up'}
           </button>
         </form>
 

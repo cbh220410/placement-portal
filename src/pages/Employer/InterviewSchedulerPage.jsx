@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import EmployerNavbar from "./EmployerNavbar";
 import { getTable, addRow, updateRow } from "../../storage/db";
 import { useAuth } from "../../context/AuthContext";
+import { createInterview, fetchApplicationById, isBackendUnavailable } from "../../services/portalApi";
 import styles from "./InterviewSchedulerPage.module.css";
 
 const InterviewSchedulerPage = () => {
@@ -18,12 +19,26 @@ const InterviewSchedulerPage = () => {
   ];
 
   useEffect(() => {
-    const apps = getTable("applications");
-    const found = apps.find((a) => a.id === Number(applicationId));
-    setApplication(found || null);
+    const loadApplication = async () => {
+      try {
+        const found = await fetchApplicationById(applicationId);
+        setApplication(found || null);
+        return;
+      } catch (error) {
+        if (!isBackendUnavailable(error)) {
+          console.error("Failed to load application from backend:", error);
+        }
+      }
+
+      const apps = getTable("applications");
+      const found = apps.find((a) => Number(a.id) === Number(applicationId));
+      setApplication(found || null);
+    };
+
+    loadApplication();
   }, [applicationId]);
 
-  const handleBookSlot = (slot) => {
+  const handleBookSlot = async (slot) => {
     if (!application) return;
 
     const interview = {
@@ -40,8 +55,22 @@ const InterviewSchedulerPage = () => {
       createdAt: new Date().toISOString(),
     };
 
-    addRow("interviews", interview);
-    updateRow("applications", application.id, { status: "Interview Scheduled" });
+    try {
+      await createInterview({
+        applicationId: application.id,
+        date: slot.date,
+        time: slot.time,
+        employerEmail: user.email,
+        employerName: user.name,
+      });
+    } catch (error) {
+      if (!isBackendUnavailable(error)) {
+        alert(error.message || "Failed to schedule interview");
+        return;
+      }
+      addRow("interviews", interview);
+      updateRow("applications", application.id, { status: "Interview Scheduled" });
+    }
 
     setSelectedSlot(slot);
     alert(

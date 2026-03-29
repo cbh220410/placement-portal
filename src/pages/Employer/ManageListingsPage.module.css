@@ -1,78 +1,171 @@
-/* This file should be named src/pages/Employer/ManageListingsPage.module.css */
 .pageContainer {
-  min-height: 100vh;
-  background-color: #f0f2f5;
-  font-family: Arial, sans-serif;
-  color: #333;
+  --portal-role: employer;
+  --accent-blue: #15803d;
+  --accent-purple: #22c55e;
+  --accent-pink: #65a30d;
+  --gradient-text: linear-gradient(135deg, #14532d, #16a34a);
+  --border-primary: rgba(21, 128, 61, 0.24);
+  --card-shadow: 0 8px 24px rgba(21, 128, 61, 0.1);
+  --hover-shadow: 0 14px 30px rgba(21, 128, 61, 0.18);
+  --focus-ring: rgba(21, 128, 61, 0.2);
+  --button-shadow: rgba(21, 128, 61, 0.2);
+  --button-shadow-hover: rgba(21, 128, 61, 0.3);
+  --table-header-bg: rgba(21, 128, 61, 0.12);
+  --table-row-alt: rgba(21, 128, 61, 0.04);
+  --table-row-hover: rgba(21, 128, 61, 0.1);
+  --chart-grid: rgba(21, 128, 61, 0.16);
+   min-height: 100vh;
+  background: var(--page-bg);
+  color: var(--text-primary);
+  position: relative;
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.pageContainer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
 }
 
 .contentContainer {
-  padding: 20px;
-  max-width: 1000px;
+  padding: 60px 20px;
+  max-width: 1100px;
   margin: auto;
+  position: relative;
+  z-index: 1;
 }
 
 .mainHeading {
-  margin-top: 20px;
-  font-size: 28px;
-  color: #333;
+  font-size: 42px;
+  font-weight: 800;
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 20px 0 40px;
+  border-left: 6px solid var(--accent-blue);
+  padding-left: 15px;
+  letter-spacing: -0.5px;
 }
 
 .table {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border-primary);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(10px);
 }
 
 .tableHeader {
-  padding: 12px;
-  border: 1px solid #ddd;
+  padding: 14px 16px;
   text-align: left;
-  background-color: #f2f2f2;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+  background: var(--table-header-bg);
+  border-bottom: 1px solid var(--border-primary);
 }
 
 .tableCell {
-  padding: 12px;
-  border: 1px solid #ddd;
+  padding: 14px 16px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-primary);
 }
 
 .tableRow:nth-child(even) {
-  background-color: #f9f9f9;
+  background: var(--table-row-alt);
 }
 
-.nameLink {
-  color: #007bff;
-  text-decoration: none;
-  font-weight: bold;
+.tableRow:hover {
+  background: var(--table-row-hover);
+}
+
+.tableRow:last-child .tableCell {
+  border-bottom: none;
 }
 
 .viewButton {
-  padding: 8px 12px;
-  background-color: #007bff;
-  color: white;
+  padding: 9px 16px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.83rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   cursor: pointer;
-  margin-right: 5px;
-  transition: background-color 0.2s;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px var(--button-shadow);
 }
 
 .viewButton:hover {
-  background-color: #0056b3;
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+  box-shadow: 0 8px 24px var(--button-shadow-hover);
 }
 
-.closeButton {
-  padding: 8px 12px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+@media (max-width: 768px) {
+  .contentContainer {
+    padding: 40px 15px;
+  }
+
+  .mainHeading {
+    font-size: 32px;
+  }
+
+  .table {
+    display: block;
+    overflow-x: auto;
+  }
 }
 
-.closeButton:hover {
-  background-color: #c82333;
+
+
+
+
+/* portal-landing-bg */
+.pageContainer {
+  background: var(--page-bg);
+  position: relative;
+  overflow-x: hidden;
+  isolation: isolate;
+}
+
+.pageContainer::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 14% 18%, var(--accent-blue) 0%, transparent 42%),
+    radial-gradient(circle at 88% 12%, var(--accent-purple) 0%, transparent 40%),
+    radial-gradient(circle at 62% 88%, var(--accent-pink, var(--accent-purple)) 0%, transparent 44%);
+  opacity: 0.16;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.pageContainer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border-primary) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-primary) 1px, transparent 1px);
+  background-size: 36px 36px, 36px 36px;
+  background-position: center;
+  opacity: 0.35;
+  z-index: -1;
+  pointer-events: none;
 }

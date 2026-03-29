@@ -1,7 +1,18 @@
 /* =====================================
    PAGE BASE STYLING
    ===================================== */
-.pageContainer {
+  .pageContainer {
+  --portal-role: student;
+  --accent-blue: #1d4ed8;
+  --accent-purple: #2563eb;
+  --accent-pink: #3b82f6;
+  --gradient-text: linear-gradient(135deg, #1e3a8a, #2563eb);
+  --border-primary: rgba(29, 78, 216, 0.24);
+  --card-shadow: 0 8px 24px rgba(29, 78, 216, 0.1);
+  --hover-shadow: 0 14px 30px rgba(29, 78, 216, 0.18);
+  --focus-ring: rgba(29, 78, 216, 0.2);
+  --button-shadow: rgba(29, 78, 216, 0.2);
+  --button-shadow-hover: rgba(29, 78, 216, 0.3);
   min-height: 100vh;
   background: var(--page-bg);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -245,4 +256,40 @@
   --accent-blue: #3b82f6;
   --accent-purple: #8b5cf6;
   --accent-pink: #ec4899;
+}
+
+
+/* portal-landing-bg */
+.pageContainer {
+  background: var(--page-bg);
+  position: relative;
+  overflow-x: hidden;
+  isolation: isolate;
+}
+
+.pageContainer::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 14% 18%, var(--accent-blue) 0%, transparent 42%),
+    radial-gradient(circle at 88% 12%, var(--accent-purple) 0%, transparent 40%),
+    radial-gradient(circle at 62% 88%, var(--accent-pink, var(--accent-purple)) 0%, transparent 44%);
+  opacity: 0.16;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.pageContainer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border-primary) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-primary) 1px, transparent 1px);
+  background-size: 36px 36px, 36px 36px;
+  background-position: center;
+  opacity: 0.35;
+  z-index: -1;
+  pointer-events: none;
 }

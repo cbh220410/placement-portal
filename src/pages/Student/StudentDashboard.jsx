@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import StudentNavbar from './StudentNavbar';
 import { useAuth } from '../../context/AuthContext';
 import { getApplications, getInterviews } from '../../utils/storage';
+import { fetchStudentSummary, isBackendUnavailable } from '../../services/portalApi';
 import styles from './StudentDashboard.module.css';
 
 const getProfileCompletion = (profileData) => {
@@ -18,8 +19,14 @@ const getProfileCompletion = (profileData) => {
 
 const StudentDashboard = () => {
   const { user } = useAuth();
-  const [applications, setApplications] = useState([]);
-  const [interviews, setInterviews] = useState([]);
+  const [stats, setStats] = useState({
+    totalApplications: 0,
+    interviewCount: 0,
+    applications: [],
+    interviews: [],
+    applicationsByStatus: {},
+    interviewsByStatus: {}
+  });
 
   const profileData = {
     name: user.name,
@@ -31,20 +38,45 @@ const StudentDashboard = () => {
 
   const profileCompletion = getProfileCompletion(profileData);
 
-  useEffect(() => {
+  const loadSummary = async () => {
+    try {
+      const summary = await fetchStudentSummary(user.email);
+      console.log('✅ Student Dashboard Updated:', { apps: summary.totalApplications, interviews: summary.interviewCount });
+      setStats(summary);
+      return;
+    } catch (error) {
+      if (!isBackendUnavailable(error)) {
+        console.error('Failed loading student dashboard summary:', error);
+      }
+    }
+
     const allApps = getApplications().filter(
       (app) => app.studentEmail === user.email
     );
-    setApplications(allApps);
-
+    
     const allInterviews = getInterviews().filter(
       (intv) => intv.studentEmail === user.email
     );
-    setInterviews(allInterviews);
+
+    setStats({
+      totalApplications: allApps.length,
+      interviewCount: allInterviews.length,
+      applications: allApps,
+      interviews: allInterviews,
+      applicationsByStatus: {},
+      interviewsByStatus: {}
+    });
+  };
+
+  useEffect(() => {
+    loadSummary();
+    // Auto-refresh every 5 seconds
+    const interval = setInterval(loadSummary, 5000);
+    return () => clearInterval(interval);
   }, [user.email]);
 
-  const totalApplications = applications.length;
-  const interviewCount = interviews.length;
+  const totalApplications = stats.totalApplications;
+  const interviewCount = stats.interviewCount;
 
   return (
     <div className={styles.pageContainer}>
@@ -67,7 +99,7 @@ const StudentDashboard = () => {
           </div>
 
           <div className={styles.card}>
-            <h3 className={styles.cardHeading}>Application Stats</h3>
+            <h3 className={styles.cardHeading}>📊 Application Stats</h3>
             <div className={styles.statsContainer}>
               <div>
                 <h4 className={styles.statNumber}>{totalApplications}</h4>
@@ -78,7 +110,35 @@ const StudentDashboard = () => {
                 <p className={styles.statLabel}>Interviews</p>
               </div>
             </div>
+            {Object.keys(stats.applicationsByStatus).length > 0 && (
+              <div style={{ marginTop: '15px', borderTop: '1px solid #ddd', paddingTop: '15px' }}>
+                <p style={{ fontWeight: 'bold', marginBottom: '8px' }}>Status Breakdown:</p>
+                {Object.entries(stats.applicationsByStatus).map(([status, count]) => (
+                  <p key={status} style={{ fontSize: '12px', margin: '4px 0' }}>
+                    {status}: <strong>{count}</strong>
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
+
+          {stats.interviews.length > 0 && (
+            <div className={styles.card}>
+              <h3 className={styles.cardHeading}>📅 Upcoming Interviews</h3>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {stats.interviews.slice(0, 5).map((intv) => (
+                  <li key={intv.id} style={{ padding: '8px 0', borderBottom: '1px solid #eee' }}>
+                    <p style={{ margin: '4px 0', fontWeight: 'bold' }}>
+                      {new Date(intv.interviewDate).toLocaleDateString()}
+                    </p>
+                    <p style={{ margin: '4px 0', fontSize: '14px' }}>
+                      Status: <strong>{intv.status}</strong>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         <div className={styles.actionCard}>

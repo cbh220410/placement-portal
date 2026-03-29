@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AdminNavbar from './AdminNavbar';
+import { deleteUserById, fetchUsers, isBackendUnavailable } from '../../services/portalApi';
 import styles from './ManageUsersPage.module.css';
 
 const seedDefaultUsers = () => {
@@ -17,25 +18,41 @@ const seedDefaultUsers = () => {
 
 const ManageUsersPage = () => {
   const [users, setUsers] = useState([]);
+  const [usingFallback, setUsingFallback] = useState(false);
 
-  // Load users from localStorage or seed defaults
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('users');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setUsers(parsed);
-      } else {
+    const loadUsers = async () => {
+      try {
+        const backendUsers = await fetchUsers();
+        setUsers(backendUsers);
+        setUsingFallback(false);
+        return;
+      } catch (error) {
+        if (!isBackendUnavailable(error)) {
+          console.error('Error loading users from backend:', error);
+        }
+      }
+
+      setUsingFallback(true);
+      try {
+        const stored = localStorage.getItem('users');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setUsers(parsed);
+        } else {
+          const defaults = seedDefaultUsers();
+          setUsers(defaults);
+          localStorage.setItem('users', JSON.stringify(defaults));
+        }
+      } catch (err) {
+        console.error('Error reading users from storage. Resetting...', err);
         const defaults = seedDefaultUsers();
         setUsers(defaults);
         localStorage.setItem('users', JSON.stringify(defaults));
       }
-    } catch (err) {
-      console.error('Error reading users from storage. Resetting...', err);
-      const defaults = seedDefaultUsers();
-      setUsers(defaults);
-      localStorage.setItem('users', JSON.stringify(defaults));
-    }
+    };
+
+    loadUsers();
   }, []);
 
   const updateStorage = (updatedUsers) => {
@@ -43,10 +60,21 @@ const ManageUsersPage = () => {
     localStorage.setItem('users', JSON.stringify(updatedUsers));
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
-    const updated = users.filter((u) => u.id !== id);
-    updateStorage(updated);
+    try {
+      if (!usingFallback) {
+        await deleteUserById(id);
+      }
+      const updated = users.filter((u) => u.id !== id);
+      if (usingFallback) {
+        updateStorage(updated);
+      } else {
+        setUsers(updated);
+      }
+    } catch (error) {
+      alert(error.message || 'Failed to delete user');
+    }
   };
 
   const formatRole = (role) => {

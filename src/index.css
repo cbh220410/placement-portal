@@ -1,11 +1,157 @@
-/* Remove default browser margins & paddings */
-html, body {
-  margin: 0;
-  padding: 0;
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-/* Optional – for smooth look */
+:root,
+:root[data-theme="light"] {
+  --page-bg: #f4f6f8 !important;
+  --card-bg: #ffffff !important;
+  --text-primary: #111827 !important;
+  --text-secondary: #374151 !important;
+  --text-muted: #6b7280 !important;
+  --border-primary: #e5e7eb !important;
+  --border-color: #e5e7eb !important;
+  --accent-blue: #1f6feb !important;
+  --accent-purple: #1f6feb !important;
+  --accent-pink: #1f6feb !important;
+  --gradient-text: linear-gradient(135deg, #111827, #111827) !important;
+  --gradient-primary: linear-gradient(135deg, #111827, #111827) !important;
+  --link-hover-bg: rgba(17, 24, 39, 0.06) !important;
+  --card-shadow: 0 8px 24px rgba(17, 24, 39, 0.06) !important;
+  --hover-shadow: 0 14px 30px rgba(17, 24, 39, 0.1) !important;
+  --nav-bg: #ffffff !important;
+  --nav-shadow: 0 2px 10px rgba(17, 24, 39, 0.06) !important;
+  --toggle-bg: #f3f4f6 !important;
+  --toggle-hover-bg: #e5e7eb !important;
+  --toggle-shadow: rgba(17, 24, 39, 0.08) !important;
+  --toggle-shadow-hover: rgba(17, 24, 39, 0.12) !important;
+  --progress-bg: #e5e7eb !important;
+  --progress-glow: rgba(31, 111, 235, 0.2) !important;
+  --input-bg: #ffffff !important;
+  --input-disabled-bg: #f3f4f6 !important;
+  --focus-ring: rgba(31, 111, 235, 0.2) !important;
+  --button-shadow: rgba(31, 111, 235, 0.18) !important;
+  --button-shadow-hover: rgba(31, 111, 235, 0.24) !important;
+  --table-header-bg: #f9fafb !important;
+  --table-row-alt: #fcfcfd !important;
+  --table-row-hover: #f9fafb !important;
+  --chart-grid: rgba(17, 24, 39, 0.12) !important;
+  --landing-grid-color: rgba(17, 24, 39, 0.05) !important;
+  --landing-vignette: rgba(244, 246, 248, 0.78) !important;
+}
+
+:root[data-theme="dark"] {
+  --page-bg: #0f1115 !important;
+  --card-bg: #171a21 !important;
+  --text-primary: #f3f4f6 !important;
+  --text-secondary: #d1d5db !important;
+  --text-muted: #9ca3af !important;
+  --border-primary: #2a2f3a !important;
+  --border-color: #2a2f3a !important;
+  --accent-blue: #60a5fa !important;
+  --accent-purple: #60a5fa !important;
+  --accent-pink: #60a5fa !important;
+  --gradient-text: linear-gradient(135deg, #f3f4f6, #f3f4f6) !important;
+  --gradient-primary: linear-gradient(135deg, #f3f4f6, #f3f4f6) !important;
+  --link-hover-bg: rgba(243, 244, 246, 0.08) !important;
+  --card-shadow: 0 10px 26px rgba(0, 0, 0, 0.25) !important;
+  --hover-shadow: 0 16px 34px rgba(0, 0, 0, 0.32) !important;
+  --nav-bg: #171a21 !important;
+  --nav-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+  --toggle-bg: #1f2430 !important;
+  --toggle-hover-bg: #2a2f3a !important;
+  --toggle-shadow: rgba(0, 0, 0, 0.25) !important;
+  --toggle-shadow-hover: rgba(0, 0, 0, 0.35) !important;
+  --progress-bg: #2a2f3a !important;
+  --progress-glow: rgba(96, 165, 250, 0.28) !important;
+  --input-bg: #11151d !important;
+  --input-disabled-bg: #1b202a !important;
+  --focus-ring: rgba(96, 165, 250, 0.28) !important;
+  --button-shadow: rgba(96, 165, 250, 0.22) !important;
+  --button-shadow-hover: rgba(96, 165, 250, 0.32) !important;
+  --table-header-bg: #1f2430 !important;
+  --table-row-alt: #1a1e28 !important;
+  --table-row-hover: #232938 !important;
+  --chart-grid: rgba(243, 244, 246, 0.14) !important;
+  --landing-grid-color: rgba(243, 244, 246, 0.05) !important;
+  --landing-vignette: rgba(15, 17, 21, 0.62) !important;
+}
+
+html,
 body {
-  background: #f5f7fa;
+  margin: 0;
+  min-height: 100%;
+  font-family: "Manrope", "Poppins", "Segoe UI", sans-serif;
+  background: var(--page-bg);
+  color: var(--text-primary);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* Global polish for CSS-module class names used across pages */
+:where([class*="_container__"], [class*="_pageContainer__"]) {
+  background: var(--page-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+:where([class*="_mainHeading__"], [class*="_heading__"]) {
+  letter-spacing: -0.02em !important;
+}
+
+:where(
+  [class*="_glassContainer__"],
+  [class*="_formCard__"],
+  [class*="_profileCard__"],
+  [class*="_applicationCard__"],
+  [class*="_schedulerCard__"],
+  [class*="_statCard__"],
+  [class*="_chartCard__"],
+  [class*="_jobCard__"],
+  [class*="_card__"]
+) {
+  backdrop-filter: none !important;
+}
+
+:where(
+  [class*="_button__"],
+  [class*="_applyButton__"],
+  [class*="_logoutButton__"],
+  [class*="_viewButton__"],
+  [class*="_scheduleButton__"]
+) {
+  transition: all 0.2s ease !important;
+}
+
+@media (max-width: 768px) {
+  body {
+    line-height: 1.5;
+  }
 }

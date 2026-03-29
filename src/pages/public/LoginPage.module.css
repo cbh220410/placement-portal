@@ -1,182 +1,156 @@
-/* =========================
-   PROFESSIONAL LOGIN PAGE
-   ========================= */
-
 .container {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #e0f2ff 0%, #f4f8ff 40%, #d0e9ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--auth-bg);
+  position: relative;
   overflow: hidden;
+  isolation: isolate;
 }
 
-/* Elegant subtle animated overlay */
 .container::before {
   content: "";
   position: absolute;
-  inset: 0;
-  background: radial-gradient(
-      circle at top left,
-      rgba(0, 122, 255, 0.15),
-      transparent 60%
-    ),
-    radial-gradient(
-      circle at bottom right,
-      rgba(0, 198, 255, 0.1),
-      transparent 70%
-    );
-  animation: subtleFlow 10s ease-in-out infinite alternate;
-  z-index: 0;
+  inset: -10%;
+  background:
+    radial-gradient(circle at 12% 18%, var(--auth-glow-one) 0%, transparent 42%),
+    radial-gradient(circle at 84% 12%, var(--auth-glow-two) 0%, transparent 40%);
+  z-index: -1;
+  pointer-events: none;
 }
 
-/* Gentle gradient motion */
-@keyframes subtleFlow {
-  from {
-    background-position: 0% 0%;
-  }
-  to {
-    background-position: 100% 100%;
-  }
-}
-
-/* ===== Glass Card ===== */
 .glassContainer {
-  position: relative;
-  z-index: 1;
   width: 100%;
-  max-width: 420px;
-  padding: 45px 40px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  animation: fadeInUp 0.8s ease-out;
+  max-width: 430px;
+  background: var(--auth-card-bg);
+  border: 1px solid var(--auth-border);
+  border-radius: 14px;
+  box-shadow: var(--auth-shadow);
+  padding: 28px 24px;
+  backdrop-filter: blur(8px);
 }
 
-/* ===== Heading ===== */
 .heading {
-  font-size: 2.2rem;
-  margin-bottom: 25px;
+  margin: 0 0 18px;
+  font-size: 1.45rem;
   font-weight: 700;
-  color: #1a2b4c;
-  letter-spacing: 0.5px;
+  color: var(--text-primary);
+  text-align: left;
 }
 
-/* ===== Form Styles ===== */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .label {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #1a2b4c;
-  margin-bottom: 6px;
-  text-align: left;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .input {
   width: 100%;
-  padding: 14px;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  font-size: 1rem;
-  color: #1a2b4c;
-  transition: all 0.3s ease;
+  padding: 10px 12px;
+  border: 1px solid var(--auth-input-border);
+  border-radius: 8px;
+  background: var(--auth-input-bg);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .input:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
-/* ===== Buttons ===== */
 .button {
   width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #007bff, #00b4d8);
-  color: white;
   border: none;
-  border-radius: 10px;
-  font-size: 1.05rem;
-  font-weight: 600;
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s ease;
+  background: var(--accent-blue);
+  color: #ffffff;
 }
 
 .button:hover {
-  background: linear-gradient(135deg, #0066cc, #0096c7);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 123, 255, 0.3);
+  filter: brightness(0.95);
 }
 
-/* ===== Links ===== */
+.button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.error {
+  margin: 0;
+  color: #dc2626;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
 .credentials {
-  margin-top: 22px;
-  font-size: 0.95rem;
-  color: #1a2b4c;
+  margin: 16px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
 }
 
 .credentials a {
-  color: #007bff;
   font-weight: 600;
-  text-decoration: none;
 }
 
-.credentials a:hover {
-  text-decoration: underline;
-}
-
-/* ===== Contact Button ===== */
 .contact {
-  margin-top: 15px;
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
 }
 
 .contact .button {
   width: auto;
-  padding: 12px 28px;
-  background: white;
-  color: #007bff;
-  border: 1px solid #007bff;
-  font-size: 1rem;
-  transition: all 0.3s ease;
+  padding: 9px 14px;
+  background: transparent;
+  color: var(--accent-blue);
+  border: 1px solid var(--auth-input-border);
 }
 
-.contact .button:hover {
-  background: #007bff;
-  color: white;
-  transform: translateY(-2px);
+:global(:root[data-theme='light']) {
+  --auth-bg: linear-gradient(135deg, #e6f4ff 0%, #d8efff 45%, #c8e8ff 100%);
+  --auth-card-bg: rgba(255, 255, 255, 0.9);
+  --auth-border: rgba(30, 144, 255, 0.22);
+  --auth-shadow: 0 14px 32px rgba(20, 84, 160, 0.14);
+  --auth-input-bg: #ffffff;
+  --auth-input-border: rgba(30, 111, 235, 0.24);
+  --auth-glow-one: rgba(30, 144, 255, 0.22);
+  --auth-glow-two: rgba(0, 191, 255, 0.16);
 }
 
-/* ===== Animations ===== */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 600px) {
-  .glassContainer {
-    padding: 30px;
-    max-width: 90%;
-  }
-
-  .heading {
-    font-size: 1.8rem;
-  }
+:global(:root[data-theme='dark']) {
+  --auth-bg: linear-gradient(160deg, #0d1426 0%, #13203a 48%, #0e182d 100%);
+  --auth-card-bg: rgba(18, 27, 44, 0.84);
+  --auth-border: rgba(125, 211, 252, 0.26);
+  --auth-shadow: 0 20px 44px rgba(2, 6, 23, 0.52);
+  --auth-input-bg: rgba(10, 16, 30, 0.88);
+  --auth-input-border: rgba(125, 211, 252, 0.24);
+  --auth-glow-one: rgba(59, 130, 246, 0.3);
+  --auth-glow-two: rgba(6, 182, 212, 0.2);
 }
