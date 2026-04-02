@@ -1,48 +1,119 @@
-// This file should be named src/pages/CreatorsPage.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Github, Mail, Phone } from 'lucide-react';
+import FloatingThemeToggle from '../components/FloatingThemeToggle';
 import styles from './CreatorsPage.module.css';
 
-const creators = [
-  { name: 'REVANTH JALADI', role: 'Frontend Developer', phone: '8074524800', portfolio: 'https://github.com/revanth', email: '2400030024@kluniversity.in', imgSrc: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' },
-  { name: 'VAMSI KRISHNA', role: 'UI/UX Designer', phone: '+91 XXXX-XXXXXX', portfolio: 'https://linkedin.com/vamsi', email: 'vamsi@example.com', imgSrc: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' },
-  { name: 'JAYANTH', role: 'Backend Developer', phone: '+91 XXXX-XXXXXX', portfolio: 'https://github.com/jayanth', email: 'jayanth@example.com', imgSrc: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' },
-];
+const profile = {
+  name: 'Revanth Jaladi',
+  role: 'Frontend Developer',
+  phone: '8074524800',
+  email: '2400030024@kluniversity.in',
+  github: 'https://github.com/revanth',
+  summary:
+    'Focused on crafting the student-facing experience, public entry flow, and a cleaner placement portal interface across light and dark themes.',
+};
 
-const CreatorsPage = () => {
+const ContactPage = () => {
   return (
     <div className={styles.container}>
-      <div className={styles.content}>
-        <h1 className={styles.heading}>Meet the Team</h1>
-        <p className={styles.subheading}>Meet the team behind the project.</p>
-        
-        <div className={styles.cardGrid}>
-          {creators.map(creator => (
-            <div key={creator.name} className={styles.card}>
-              <img src={creator.imgSrc} alt={creator.name} className={styles.profileImg} />
-              <h3 className={styles.cardHeading}>{creator.name}</h3>
-              <p className={styles.cardText}>**Role:** {creator.role}</p>
-              <p className={styles.cardText}>**Phone:** {creator.phone}</p>
-              <div className={styles.socials}>
-                <a href={`mailto:${creator.email}`} className={styles.socialLink}>
-                  <img src="https://cdn-icons-png.flaticon.com/512/732/732223.png" alt="Outlook" className={styles.socialIcon} />
-                </a>
-                <a href={creator.portfolio} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                  <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="GitHub" className={styles.socialIcon} />
-                </a>
+      <FloatingThemeToggle />
+
+      <div className={styles.shell}>
+        <motion.section
+          className={styles.infoPanel}
+          initial={{ opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55 }}
+        >
+          <Link to="/" className={styles.backLink}>
+            Back to home
+          </Link>
+
+          <span className={styles.kicker}>Project contact</span>
+          <h1 className={styles.title}>Meet the creator behind this placement portal experience.</h1>
+          <p className={styles.description}>
+            If you want to discuss the interface, frontend improvements, or the overall product
+            direction, you can reach out directly here.
+          </p>
+
+          <div className={styles.storyCard}>
+            <div className={styles.storyHeader}>
+              <span className={styles.storyLabel}>Current focus</span>
+              <span className={styles.storyHint}>Placement-first product design</span>
+            </div>
+
+            <p className={styles.storyText}>{profile.summary}</p>
+
+            <div className={styles.storyPoints}>
+              <div className={styles.storyPoint}>
+                <span className={styles.pointIndex}>01</span>
+                <p>Public portal flow and onboarding screens</p>
+              </div>
+              <div className={styles.storyPoint}>
+                <span className={styles.pointIndex}>02</span>
+                <p>Theme-aware UI for light and dark mode</p>
+              </div>
+              <div className={styles.storyPoint}>
+                <span className={styles.pointIndex}>03</span>
+                <p>Consistent visual language across role portals</p>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        </motion.section>
+
+        <motion.section
+          className={styles.profilePanel}
+          initial={{ opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.08 }}
+        >
+          <div className={styles.avatar}>
+            <img
+              src="/revanth-profile.png"
+              alt="Revanth Jaladi"
+              className={styles.avatarImage}
+            />
+          </div>
+          <p className={styles.profileEyebrow}>Primary profile</p>
+          <h2 className={styles.profileName}>{profile.name}</h2>
+          <p className={styles.profileRole}>{profile.role}</p>
+
+          <div className={styles.contactList}>
+            <a href={`mailto:${profile.email}`} className={styles.contactItem}>
+              <Mail size={18} />
+              <span>{profile.email}</span>
+            </a>
+
+            <a href={`tel:${profile.phone}`} className={styles.contactItem}>
+              <Phone size={18} />
+              <span>{profile.phone}</span>
+            </a>
+
+            <a
+              href={profile.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.contactItem}
+            >
+              <Github size={18} />
+              <span>github.com/revanth</span>
+            </a>
+          </div>
+
+          <div className={styles.actionRow}>
+            <Link to="/login" className={styles.primaryAction}>
+              Open portal
+            </Link>
+            <Link to="/" className={styles.secondaryAction}>
+              Return home
+            </Link>
+          </div>
+        </motion.section>
       </div>
-      
-      <Link to="/" className={styles.backLink}>
-        <button className={styles.button}>
-          Go back to Home
-        </button>
-      </Link>
     </div>
   );
 };
 
-export default CreatorsPage;
+export default ContactPage;

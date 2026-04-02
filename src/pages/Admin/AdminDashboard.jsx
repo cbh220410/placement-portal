@@ -1,5 +1,5 @@
-// src/pages/Admin/AdminDashboard.jsx
 import React, { useEffect, useState } from 'react';
+import { Activity, BriefcaseBusiness, ShieldCheck, UsersRound } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import AdminNavbar from './AdminNavbar';
 import { fetchJobs, fetchAdminSummary, isBackendUnavailable, deleteJob } from '../../services/portalApi';
@@ -14,18 +14,14 @@ const AdminDashboard = () => {
     totalJobs: 0,
     totalApplications: 0,
     totalInterviews: 0,
-    applicationsByStatus: []
+    applicationsByStatus: [],
   });
   const [jobs, setJobs] = useState([]);
   const [isDeleting, setIsDeleting] = useState({});
 
   const loadData = async () => {
     try {
-      const [summary, allJobs] = await Promise.all([
-        fetchAdminSummary(),
-        fetchJobs()
-      ]);
-      console.log('✅ Admin Dashboard Updated:', { users: summary.totalUsers, jobs: summary.totalJobs, apps: summary.totalApplications });
+      const [summary, allJobs] = await Promise.all([fetchAdminSummary(), fetchJobs()]);
       setStats(summary);
       setJobs(allJobs);
     } catch (error) {
@@ -37,104 +33,159 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     loadData();
-    // Auto-refresh every 5 seconds
     const interval = setInterval(loadData, 5000);
     return () => clearInterval(interval);
   }, []);
 
   const handleDeleteJob = async (jobId, jobTitle) => {
     if (window.confirm(`Are you sure you want to delete "${jobTitle}" and all its applications?`)) {
-      setIsDeleting(prev => ({ ...prev, [jobId]: true }));
+      setIsDeleting((prev) => ({ ...prev, [jobId]: true }));
       try {
         await deleteJob(jobId);
-        alert('Job deleted successfully!');
+        alert('Job deleted successfully.');
         await loadData();
       } catch (error) {
         alert(error.message || 'Failed to delete job');
       } finally {
-        setIsDeleting(prev => ({ ...prev, [jobId]: false }));
+        setIsDeleting((prev) => ({ ...prev, [jobId]: false }));
       }
     }
   };
 
+  const statCards = [
+    {
+      label: 'Total users',
+      value: stats.totalUsers,
+      note: `${stats.totalStudents} students and ${stats.totalEmployers} employers`,
+      icon: <UsersRound size={18} />,
+    },
+    {
+      label: 'Active jobs',
+      value: stats.totalJobs,
+      note: 'Listings currently available in the system',
+      icon: <BriefcaseBusiness size={18} />,
+    },
+    {
+      label: 'Interviews tracked',
+      value: stats.totalInterviews,
+      note: 'Scheduled interviews across the platform',
+      icon: <Activity size={18} />,
+    },
+  ];
+
   return (
     <div className={styles.pageContainer}>
       <AdminNavbar />
+
       <div className={styles.contentContainer}>
-        <h1 className={styles.mainHeading}>Welcome, Admin {user.name}!</h1>
-        
-        <div className={styles.cardGrid}>
-          <div className={styles.card}>
-            <h3 className={styles.cardHeading}>System Overview</h3>
-            <p className={styles.infoText}>👥 Total Users: <strong>{stats.totalUsers}</strong></p>
-            <p className={styles.infoText}>🎓 Students: <strong>{stats.totalStudents}</strong></p>
-            <p className={styles.infoText}>🏢 Employers: <strong>{stats.totalEmployers}</strong></p>
-            <p className={styles.infoText}>💼 Active Jobs: <strong>{stats.totalJobs}</strong></p>
-            <p className={styles.infoText}>📋 Applications: <strong>{stats.totalApplications}</strong></p>
-            <p className={styles.infoText}>📅 Interviews: <strong>{stats.totalInterviews}</strong></p>
+        <section className={styles.heroSection}>
+          <div className={styles.heroCopy}>
+            <span className={styles.eyebrow}>Admin workspace</span>
+            <h1 className={styles.mainHeading}>Welcome back, {user.name}.</h1>
+            <p className={styles.heroText}>
+              Keep an eye on platform health, user activity, and job operations from one system
+              overview.
+            </p>
           </div>
 
-          <div className={styles.card}>
-            <h3 className={styles.cardHeading}>Application Status Breakdown</h3>
-            {stats.applicationsByStatus && stats.applicationsByStatus.length > 0 ? (
-              <div>
+          <div className={styles.heroBadge}>
+            <ShieldCheck size={18} />
+            <span>Oversight across users, jobs, and activity</span>
+          </div>
+        </section>
+
+        <section className={styles.statGrid}>
+          {statCards.map((card) => (
+            <article key={card.label} className={styles.statCard}>
+              <div className={styles.statHeader}>
+                <span className={styles.statIcon}>{card.icon}</span>
+                <span className={styles.statLabel}>{card.label}</span>
+              </div>
+              <p className={styles.statValue}>{card.value}</p>
+              <p className={styles.statNote}>{card.note}</p>
+            </article>
+          ))}
+        </section>
+
+        <section className={styles.panelGrid}>
+          <article className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h2 className={styles.panelTitle}>System overview</h2>
+              <span className={styles.panelHint}>Top-level platform totals</span>
+            </div>
+
+            <div className={styles.statusList}>
+              <div className={styles.statusRow}>
+                <span>Total applications</span>
+                <strong>{stats.totalApplications}</strong>
+              </div>
+              <div className={styles.statusRow}>
+                <span>Total interviews</span>
+                <strong>{stats.totalInterviews}</strong>
+              </div>
+              <div className={styles.statusRow}>
+                <span>Students</span>
+                <strong>{stats.totalStudents}</strong>
+              </div>
+              <div className={styles.statusRow}>
+                <span>Employers</span>
+                <strong>{stats.totalEmployers}</strong>
+              </div>
+            </div>
+          </article>
+
+          <article className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h2 className={styles.panelTitle}>Application status breakdown</h2>
+              <span className={styles.panelHint}>How applications are progressing</span>
+            </div>
+
+            {stats.applicationsByStatus?.length > 0 ? (
+              <div className={styles.statusList}>
                 {stats.applicationsByStatus.map((statusItem) => (
-                  <p key={statusItem.status} className={styles.infoText}>
-                    {statusItem.status}: <strong>{statusItem.count}</strong>
-                  </p>
+                  <div key={statusItem.status} className={styles.statusRow}>
+                    <span>{statusItem.status}</span>
+                    <strong>{statusItem.count}</strong>
+                  </div>
                 ))}
               </div>
             ) : (
-              <p className={styles.infoText}>No applications yet</p>
+              <p className={styles.emptyState}>No application data available yet.</p>
             )}
-          </div>
-        </div>
+          </article>
+        </section>
 
-        <div style={{ marginTop: '40px' }}>
-          <h2 className={styles.sectionHeading}>Manage Jobs</h2>
+        <section className={styles.panelWide}>
+          <div className={styles.panelHeader}>
+            <h2 className={styles.panelTitle}>Manage jobs</h2>
+            <span className={styles.panelHint}>Review and remove live listings</span>
+          </div>
+
           {jobs.length === 0 ? (
-            <p>No jobs available.</p>
+            <p className={styles.emptyState}>No jobs available.</p>
           ) : (
-            <table className={styles.table} style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#f0f0f0', borderBottom: '2px solid #ddd' }}>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Job Title</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Company</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Location</th>
-                  <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Posted By</th>
-                  <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {jobs.map((job) => (
-                  <tr key={job.id} style={{ borderBottom: '1px solid #eee' }}>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #eee' }}>{job.title}</td>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #eee' }}>{job.company || job.employerName}</td>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #eee' }}>{job.location}</td>
-                    <td style={{ padding: '12px', borderBottom: '1px solid #eee' }}>{job.employerEmail}</td>
-                    <td style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #eee' }}>
-                      <button
-                        onClick={() => handleDeleteJob(job.id, job.title)}
-                        disabled={isDeleting[job.id]}
-                        style={{
-                          padding: '8px 16px',
-                          backgroundColor: '#dc3545',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: isDeleting[job.id] ? 'not-allowed' : 'pointer',
-                          opacity: isDeleting[job.id] ? 0.6 : 1
-                        }}
-                      >
-                        {isDeleting[job.id] ? 'Deleting...' : 'Delete'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className={styles.jobGrid}>
+              {jobs.map((job) => (
+                <article key={job.id} className={styles.jobCard}>
+                  <div className={styles.jobMeta}>
+                    <p className={styles.jobTitle}>{job.title}</p>
+                    <p className={styles.jobSubtext}>{job.company || job.employerName}</p>
+                    <p className={styles.jobSubtext}>{job.location}</p>
+                    <p className={styles.jobSubtext}>{job.employerEmail}</p>
+                  </div>
+
+                  <button
+                    onClick={() => handleDeleteJob(job.id, job.title)}
+                    disabled={isDeleting[job.id]}
+                    className={styles.deleteButton}
+                  >
+                    {isDeleting[job.id] ? 'Deleting...' : 'Delete job'}
+                  </button>
+                </article>
+              ))}
+            </div>
           )}
-        </div>
+        </section>
       </div>
     </div>
   );

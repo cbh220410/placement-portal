@@ -1,11 +1,11 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import styles from './OfficerNavbar.module.css';
 
 const OfficerNavbar = () => {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -16,34 +16,50 @@ const OfficerNavbar = () => {
 
   return (
     <nav className={styles.nav}>
-      <div className={styles.brand}>
-        <Link to="/officer" className={styles.brandLink}>Placement Cell</Link>
+      <div className={styles.brandBlock}>
+        <NavLink to="/officer" className={styles.brandLink}>
+          Placement Cell
+        </NavLink>
+        <span className={styles.portalMeta}>Campus coordination workspace</span>
       </div>
 
-      <ul className={styles.navList}>
-        <li className={styles.navItem}>
-          <Link to="/officer" className={styles.navLink}>Dashboard</Link>
-        </li>
-
-        <li className={styles.navItem}>
-          <Link to="/officer/student-status" className={styles.navLink}>Student Status</Link>
-        </li>
-
-        {/* THEME TOGGLE BUTTON */}
-        <li className={styles.navItem}>
-          <button 
-            onClick={toggleTheme} 
-            className={styles.themeToggle} 
-            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+      <div className={styles.navContent}>
+        <div className={styles.navList}>
+          <NavLink
+            to="/officer"
+            end
+            className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}
           >
-            {isDark ? "\u2600\uFE0F" : "\uD83C\uDF19"}
-          </button>
-        </li>
+            Dashboard
+          </NavLink>
+          <NavLink
+            to="/officer/student-status"
+            className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}
+          >
+            Student Status
+          </NavLink>
+        </div>
 
-        <li className={styles.navItem}>
-          <button onClick={handleLogout} className={styles.logoutButton}>Log Out</button>
-        </li>
-      </ul>
+        <div className={styles.tools}>
+          <div className={styles.userChip}>
+            <span className={styles.userInitial}>{user?.name?.charAt(0) || 'O'}</span>
+            <span className={styles.userName}>{user?.name || 'Officer'}</span>
+          </div>
+
+          <button
+            onClick={toggleTheme}
+            className={styles.themeToggle}
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label="Toggle theme"
+          >
+            {isDark ? 'Light' : 'Dark'}
+          </button>
+
+          <button onClick={handleLogout} className={styles.logoutButton}>
+            Log Out
+          </button>
+        </div>
+      </div>
     </nav>
   );
 };

@@ -1,6 +1,6 @@
-// src/pages/PlacementOfficer/OfficerDashboard.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ClipboardList, GraduationCap, LayoutDashboard, Users } from 'lucide-react';
 import OfficerNavbar from './OfficerNavbar';
 import { useAuth } from '../../context/AuthContext';
 import { fetchOfficerSummary, isBackendUnavailable } from '../../services/portalApi';
@@ -14,13 +14,12 @@ const OfficerDashboard = () => {
     totalJobs: 0,
     totalApplications: 0,
     totalInterviews: 0,
-    applicationStats: []
+    applicationStats: [],
   });
 
   const loadSummary = async () => {
     try {
       const summary = await fetchOfficerSummary();
-      console.log('✅ Officer Dashboard Updated:', { students: summary.totalStudents, jobs: summary.totalJobs, apps: summary.totalApplications });
       setStats(summary);
       return;
     } catch (error) {
@@ -37,20 +36,18 @@ const OfficerDashboard = () => {
           totalJobs: 0,
           totalApplications: 0,
           totalInterviews: 0,
-          applicationStats: []
+          applicationStats: [],
         });
         return;
       }
 
       const students = JSON.parse(stored).filter((userItem) => userItem.role === 'student');
-      const totalStudents = students.length;
-
       setStats({
-        totalStudents,
+        totalStudents: students.length,
         totalJobs: 0,
         totalApplications: 0,
         totalInterviews: 0,
-        applicationStats: []
+        applicationStats: [],
       });
     } catch (e) {
       console.error('Error reading students for officer dashboard:', e);
@@ -59,97 +56,109 @@ const OfficerDashboard = () => {
 
   useEffect(() => {
     loadSummary();
-    // Auto-refresh every 5 seconds
     const interval = setInterval(loadSummary, 5000);
     return () => clearInterval(interval);
   }, []);
 
   const cards = [
-    { label: '🎓 Total Students', value: stats.totalStudents, color: '#60a5fa' },
-    { label: '💼 Active Jobs', value: stats.totalJobs, color: '#34d399' },
-    { label: '📋 Total Applications', value: stats.totalApplications, color: '#fbbf24' },
-    { label: '📅 Total Interviews', value: stats.totalInterviews, color: '#f87171' },
+    { label: 'Total students', value: stats.totalStudents, note: 'Profiles under placement tracking', icon: <GraduationCap size={18} /> },
+    { label: 'Active jobs', value: stats.totalJobs, note: 'Open opportunities linked to drives', icon: <LayoutDashboard size={18} /> },
+    { label: 'Applications', value: stats.totalApplications, note: 'Campus-wide application volume', icon: <ClipboardList size={18} /> },
+    { label: 'Interviews', value: stats.totalInterviews, note: 'Scheduled across the portal', icon: <Users size={18} /> },
   ];
 
   const quickActions = [
     {
-      title: 'Stats',
-      description: 'View detailed placement statistics',
-      icon: '📊',
-      action: () => {
-        console.log('Opening Stats - Dashboard with detailed breakdowns');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      title: 'Review dashboard stats',
+      description: 'Stay current on placement movement and summary data.',
+      action: () => window.scrollTo({ top: 0, behavior: 'smooth' }),
     },
     {
-      title: 'Users',
-      description: 'Manage student placement records',
-      icon: '👥',
-      action: () => navigate('/officer/student-status')
+      title: 'Manage student status',
+      description: 'Update placement outcomes and monitor student records.',
+      action: () => navigate('/officer/student-status'),
     },
     {
-      title: 'Applications',
-      description: 'Track application and placement progress',
-      icon: '📋',
-      action: () => navigate('/officer')
-    }
+      title: 'Track applications',
+      description: 'Use the status summary to spot movement or bottlenecks.',
+      action: () => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }),
+    },
   ];
 
   return (
     <div className={styles.pageContainer}>
       <OfficerNavbar />
+
       <div className={styles.contentContainer}>
-        <h1 className={styles.mainHeading}>Welcome, Officer {user.name}!</h1>
+        <section className={styles.heroSection}>
+          <div className={styles.heroCopy}>
+            <span className={styles.eyebrow}>Placement officer workspace</span>
+            <h1 className={styles.mainHeading}>Welcome back, {user.name}.</h1>
+            <p className={styles.heroText}>
+              Oversee campus placement activity, student progress, and application movement from
+              one coordinated view.
+            </p>
+          </div>
 
-        <div className={styles.statsGrid}>
-          {cards.map((stat, index) => (
-            <div key={index} className={styles.statCard}>
-              <p className={styles.statLabel}>{stat.label}</p>
-              <h2 className={styles.statValue} style={{ color: stat.color }}>
-                {stat.value}
-              </h2>
-            </div>
+          <div className={styles.heroBadge}>
+            <Users size={18} />
+            <span>Campus coordination in one place</span>
+          </div>
+        </section>
+
+        <section className={styles.statGrid}>
+          {cards.map((card) => (
+            <article key={card.label} className={styles.statCard}>
+              <div className={styles.statHeader}>
+                <span className={styles.statIcon}>{card.icon}</span>
+                <span className={styles.statLabel}>{card.label}</span>
+              </div>
+              <p className={styles.statValue}>{card.value}</p>
+              <p className={styles.statNote}>{card.note}</p>
+            </article>
           ))}
-        </div>
+        </section>
 
-        <div className={styles.actionCard}>
-          <h3 className={styles.cardHeading}>Quick Actions</h3>
-          <ul className={styles.actionList}>
-            {quickActions.map((action, index) => (
-              <li 
-                key={index}
-                className={styles.actionItem}
-                onClick={action.action}
-                style={{ cursor: 'pointer' }}
-                title="Click to navigate"
-              >
-                <span style={{ fontSize: '20px', marginRight: '10px' }}>{action.icon}</span>
-                <div>
-                  <strong>{action.title}</strong>
-                  <p>{action.description}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <section className={styles.panelGrid}>
+          <article className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h2 className={styles.panelTitle}>Quick actions</h2>
+              <span className={styles.panelHint}>Common placement tasks</span>
+            </div>
 
-        <div className={styles.card} style={{ marginTop: '30px' }}>
-          <h3 className={styles.cardHeading}>Application Status Summary</h3>
-          {stats.applicationStats && stats.applicationStats.length > 0 ? (
-            <div>
-              {stats.applicationStats.map((statusItem, index) => (
-                <div key={index} style={{ padding: '8px 0', borderBottom: '1px solid #eee' }}>
-                  <p style={{ margin: '0', display: 'flex', justifyContent: 'space-between' }}>
-                    <strong>{statusItem.status}</strong>
-                    <span style={{ color: '#007bff', fontWeight: 'bold' }}>{statusItem.count}</span>
-                  </p>
-                </div>
+            <div className={styles.actionList}>
+              {quickActions.map((action, index) => (
+                <button key={action.title} className={styles.actionItem} onClick={action.action}>
+                  <span className={styles.actionIndex}>0{index + 1}</span>
+                  <span className={styles.actionBody}>
+                    <strong>{action.title}</strong>
+                    <span>{action.description}</span>
+                  </span>
+                </button>
               ))}
             </div>
-          ) : (
-            <p>No applications data available</p>
-          )}
-        </div>
+          </article>
+
+          <article className={styles.panel}>
+            <div className={styles.panelHeader}>
+              <h2 className={styles.panelTitle}>Application status summary</h2>
+              <span className={styles.panelHint}>Snapshot of placement flow</span>
+            </div>
+
+            {stats.applicationStats?.length > 0 ? (
+              <div className={styles.statusList}>
+                {stats.applicationStats.map((statusItem) => (
+                  <div key={statusItem.status} className={styles.statusRow}>
+                    <span>{statusItem.status}</span>
+                    <strong>{statusItem.count}</strong>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className={styles.emptyState}>No applications data available yet.</p>
+            )}
+          </article>
+        </section>
       </div>
     </div>
   );
