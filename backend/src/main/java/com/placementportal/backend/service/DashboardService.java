@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,6 +48,7 @@ public class DashboardService {
 
     @Transactional(readOnly = true)
     public Map<String, Object> adminSummary() {
+        List<JobApplication> applications = applicationRepository.findAll();
         Map<String, Object> summary = new HashMap<>();
         summary.put("totalUsers", userRepository.count());
         summary.put("totalStudents", userRepository.countByRole(UserRole.STUDENT));
@@ -54,7 +56,10 @@ public class DashboardService {
         summary.put("totalOfficers", userRepository.countByRole(UserRole.OFFICER));
         summary.put("totalAdmins", userRepository.countByRole(UserRole.ADMIN));
         summary.put("activeJobs", jobRepository.count());
-        summary.put("totalApplications", applicationRepository.count());
+        summary.put("totalJobs", jobRepository.count());
+        summary.put("totalApplications", applications.size());
+        summary.put("totalInterviews", interviewRepository.count());
+        summary.put("applicationsByStatus", buildStatusBreakdown(applications));
         return summary;
     }
 
@@ -78,6 +83,11 @@ public class DashboardService {
         }).collect(Collectors.toList());
 
         Map<String, Object> summary = new HashMap<>();
+        summary.put("totalJobs", jobs.size());
+        summary.put("totalApplications", applications.size());
+        summary.put("jobs", listings);
+        summary.put("applicationsByStatus", buildStatusBreakdownMap(applications));
+        summary.put("recentApplications", applications.stream().limit(5).collect(Collectors.toList()));
         summary.put("newApplications", applications.size());
         summary.put("activeListings", listings);
         return summary;
@@ -86,12 +96,15 @@ public class DashboardService {
     @Transactional(readOnly = true)
     public Map<String, Object> studentSummary(String studentEmail) {
         String normalizedEmail = studentEmail.trim().toLowerCase(Locale.ROOT);
-        long applicationCount = applicationRepository.countByStudentEmail(normalizedEmail);
-        long interviewCount = interviewRepository.countByStudentEmail(normalizedEmail);
+        List<JobApplication> applications = applicationRepository.findByStudentEmailOrderByAppliedAtDesc(normalizedEmail);
+        List<Interview> interviews = interviewRepository.findByStudentEmailOrderByCreatedAtDesc(normalizedEmail);
 
         Map<String, Object> summary = new HashMap<>();
-        summary.put("totalApplications", applicationCount);
-        summary.put("interviewCount", interviewCount);
+        summary.put("totalApplications", applications.size());
+        summary.put("interviewCount", interviews.size());
+        summary.put("applications", applications);
+        summary.put("interviews", interviews);
+        summary.put("applicationsByStatus", buildStatusBreakdownMap(applications));
         return summary;
     }
 
@@ -113,9 +126,13 @@ public class DashboardService {
 
         Map<String, Object> summary = new HashMap<>();
         summary.put("totalStudents", totalStudents);
+        summary.put("totalJobs", jobRepository.count());
+        summary.put("totalApplications", applicationRepository.count());
+        summary.put("totalInterviews", interviewRepository.count());
         summary.put("placedStudents", placedStudents);
         summary.put("unplacedStudents", unplacedStudents);
         summary.put("companiesRegistered", companies.size());
+        summary.put("applicationStats", buildStatusBreakdown(applicationRepository.findAll()));
         return summary;
     }
 
@@ -224,5 +241,53 @@ public class DashboardService {
         }
 
         return anomalies;
+    }
+
+    private List<Map<String, Object>> buildStatusBreakdown(List<JobApplication> applications) {
+        return buildStatusBreakdownMap(applications).entrySet().stream()
+            .map(entry -> {
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("status", entry.getKey());
+                row.put("count", entry.getValue());
+                return row;
+            })
+            .collect(Collectors.toList());
+    }
+
+    private Map<String, Long> buildStatusBreakdownMap(List<JobApplication> applications) {
+        return applications.stream()
+            .collect(Collectors.groupingBy(
+                application -> formatStatus(application.getStatus().name()),
+                LinkedHashMap::new,
+                Collectors.counting()
+            ))
+            .entrySet()
+            .stream()
+            .sorted(Map.Entry.comparingByKey(Comparator.naturalOrder()))
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                Map.Entry::getValue,
+                (left, right) -> left,
+                LinkedHashMap::new
+            ));
+    }
+
+    private String formatStatus(String status) {
+        String normalized = status == null ? "" : status.trim().toLowerCase(Locale.ROOT).replace('_', ' ');
+        String[] parts = normalized.split(" ");
+        StringBuilder builder = new StringBuilder();
+        for (String part : parts) {
+            if (part.isBlank()) {
+                continue;
+            }
+            if (builder.length() > 0) {
+                builder.append(' ');
+            }
+            builder.append(Character.toUpperCase(part.charAt(0)));
+            if (part.length() > 1) {
+                builder.append(part.substring(1));
+            }
+        }
+        return builder.toString();
     }
 }

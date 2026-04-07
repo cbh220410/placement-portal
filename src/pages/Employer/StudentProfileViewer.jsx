@@ -10,6 +10,15 @@ import {
 } from "../../services/portalApi";
 import styles from "./StudentProfileViewer.module.css";
 
+const normalizeResumeLink = (value) => {
+  const trimmed = value?.trim() || "";
+  if (!trimmed) return "";
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+};
+
 const StudentProfileViewer = () => {
   const { studentId } = useParams();
   const [student, setStudent] = useState(null);
@@ -80,15 +89,15 @@ const StudentProfileViewer = () => {
             <strong>Resume:</strong>{" "}
             {student.resume ? (
               <a
-                href={student.resume}
+                href={normalizeResumeLink(student.resume)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.resumeLink}
               >
-                View Resume
+                Open Resume Link
               </a>
             ) : (
-              <span className={styles.noResume}>No Resume Uploaded</span>
+              <span className={styles.noResume}>No Resume Link Added</span>
             )}
           </p>
         </div>

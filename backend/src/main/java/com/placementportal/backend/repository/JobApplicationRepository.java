@@ -15,7 +15,11 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
 
     List<JobApplication> findByJobIdInOrderByAppliedAtDesc(Collection<Long> jobIds);
 
+    List<JobApplication> findByJobId(Long jobId);
+
     Optional<JobApplication> findByJobIdAndStudentEmail(Long jobId, String studentEmail);
+
+    void deleteByJobId(Long jobId);
 
     long countByAppliedAtAfter(LocalDateTime timestamp);
 

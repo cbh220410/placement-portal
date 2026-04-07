@@ -1,321 +1,271 @@
-/* =====================================
-   PAGE BASE STYLING
-   ===================================== */
-  .pageContainer {
-  --portal-role: officer;
-  --accent-blue: #b45309;
-  --accent-purple: #d97706;
-  --accent-pink: #f59e0b;
-  --gradient-text: linear-gradient(135deg, #92400e, #d97706);
-  --border-primary: rgba(180, 83, 9, 0.24);
-  --card-shadow: 0 8px 24px rgba(180, 83, 9, 0.1);
-  --hover-shadow: 0 14px 30px rgba(180, 83, 9, 0.18);
-  --focus-ring: rgba(180, 83, 9, 0.2);
-  --button-shadow: rgba(180, 83, 9, 0.22);
-  --button-shadow-hover: rgba(180, 83, 9, 0.32);
+.pageContainer {
+  --role-accent: #b45309;
+  --role-accent-strong: #d97706;
+  --role-wash: rgba(180, 83, 9, 0.12);
   min-height: 100vh;
-  background: var(--page-bg);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--text-primary);
+  background:
+    radial-gradient(circle at 12% 14%, rgba(180, 83, 9, 0.14), transparent 24%),
+    radial-gradient(circle at 88% 20%, rgba(245, 158, 11, 0.12), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(244, 246, 248, 1));
   position: relative;
   overflow-x: hidden;
-  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .pageContainer::before {
-  content: '';
+  content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+  inset: 0;
+  background-image:
+    linear-gradient(var(--landing-grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--landing-grid-color) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.26), transparent 88%);
+  z-index: 0;
+  pointer-events: none;
 }
 
-/* =====================================
-   CONTENT WRAPPER
-   ===================================== */
 .contentContainer {
-  padding: 60px 20px;
-  max-width: 1200px;
-  margin: auto;
+  width: min(1220px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 34px 0 48px;
   position: relative;
   z-index: 1;
 }
 
-/* =====================================
-   HEADING STYLING
-   ===================================== */
-.mainHeading {
-  font-size: 42px;
-  font-weight: 800;
-  background: var(--gradient-text);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 20px 0 40px;
-  border-left: 6px solid var(--accent-blue);
-  padding-left: 15px;
-  letter-spacing: -0.5px;
+.heroSection,
+.filterCard,
+.tableCard {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 20px 42px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(18px);
 }
 
-/* =====================================
-   FILTER SECTION
-   ===================================== */
-.filterSection {
+.heroSection {
+  padding: 30px;
+  border-radius: 34px;
   display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  background:
+    radial-gradient(circle at 16% 16%, rgba(255, 255, 255, 0.86), transparent 24%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.52));
+}
+
+.eyebrow {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 30px;
-  padding: 16px 20px;
-  background: var(--card-bg);
-  border-radius: 12px;
-  border: 1px solid var(--border-primary);
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  color: var(--role-accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mainHeading {
+  margin: 16px 0 10px;
+  font-size: clamp(2.3rem, 5vw, 4rem);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+  color: var(--text-primary);
+}
+
+.heroText {
+  margin: 0;
+  max-width: 640px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.filterCard {
+  min-width: 240px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .filterLabel {
-  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
   color: var(--text-secondary);
+  font-size: 0.84rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-size: 0.9rem;
 }
 
-.filterSelect {
-  padding: 8px 12px;
-  border: 1px solid var(--border-primary);
-  border-radius: 6px;
-  background: var(--input-bg);
+.filterSelect,
+.statusSelect,
+.companyInput {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: rgba(255, 255, 255, 0.8);
   color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
+  font-size: 0.95rem;
 }
 
-.filterSelect:hover {
-  border-color: var(--accent-blue);
-}
-
-.filterSelect:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
-}
-
-/* =====================================
-   TABLE CARD
-   ===================================== */
 .tableCard {
-  background: var(--card-bg);
-  border-radius: 16px;
-  border: 1px solid var(--border-primary);
-  box-shadow: var(--card-shadow);
+  margin-top: 24px;
+  border-radius: 28px;
   overflow: hidden;
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.72);
 }
 
-/* =====================================
-   TABLE STYLING
-   ===================================== */
+.tableWrap {
+  overflow-x: auto;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
 }
 
 .th {
-  background: linear-gradient(135deg, rgba(217, 119, 6, 0.2), rgba(245, 158, 11, 0.2));
-  color: var(--accent-blue);
-  padding: 16px;
-  font-weight: 700;
+  padding: 18px 16px;
+  background: rgba(180, 83, 9, 0.08);
+  color: var(--role-accent);
+  font-size: 0.84rem;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-size: 0.9rem;
-  border-bottom: 2px solid var(--border-primary);
+  text-align: left;
 }
 
 .tr {
-  border-bottom: 1px solid var(--border-primary);
-  transition: background 0.3s ease;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .tr:hover {
-  background: rgba(217, 119, 6, 0.1);
-}
-
-.tr:last-child {
-  border-bottom: none;
+  background: rgba(180, 83, 9, 0.04);
 }
 
 .td {
   padding: 16px;
+  vertical-align: top;
   color: var(--text-secondary);
 }
 
-/* =====================================
-   STUDENT INFO
-   ===================================== */
 .studentName {
-  font-weight: 700;
   color: var(--text-primary);
+  font-weight: 800;
   margin-bottom: 4px;
 }
 
-.studentEmail,
-.email {
-  font-size: 0.85rem;
+.studentEmail {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.statusSelect {
+  font-weight: 700;
+}
+
+.placed {
+  border-left: 4px solid #16a34a;
+}
+
+.unplaced {
+  border-left: 4px solid #dc2626;
+}
+
+.companyCell {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.companyInput {
+  min-width: 180px;
+}
+
+.saveButton {
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--role-accent), var(--role-accent-strong));
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.saveButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.companyPlaceholder {
   color: var(--text-muted);
 }
 
-/* =====================================
-   STATUS SELECT
-   ===================================== */
-.statusSelect {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border-primary);
-  background: var(--input-bg);
-  color: var(--text-primary);
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 0.05em;
+.emptyState {
+  margin: 0;
+  padding: 28px;
+  color: var(--text-secondary);
 }
 
-.statusSelect:hover {
-  border-color: var(--accent-blue);
+:global(:root[data-theme='dark']) .pageContainer {
+  background:
+    radial-gradient(circle at 12% 14%, rgba(180, 83, 9, 0.18), transparent 24%),
+    radial-gradient(circle at 88% 20%, rgba(245, 158, 11, 0.14), transparent 22%),
+    linear-gradient(180deg, rgba(15, 17, 21, 0.98), rgba(11, 15, 23, 1));
 }
 
-.statusSelect:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+:global(:root[data-theme='dark']) .heroSection,
+:global(:root[data-theme='dark']) .filterCard,
+:global(:root[data-theme='dark']) .tableCard,
+:global(:root[data-theme='dark']) .eyebrow,
+:global(:root[data-theme='dark']) .filterSelect,
+:global(:root[data-theme='dark']) .statusSelect,
+:global(:root[data-theme='dark']) .companyInput {
+  background: rgba(15, 23, 42, 0.76);
+  border-color: rgba(148, 163, 184, 0.14);
 }
 
-.statusSelect.placed {
-  border-left: 3px solid #10b981;
+:global(:root[data-theme='dark']) .heroSection {
+  background:
+    radial-gradient(circle at 16% 16%, rgba(251, 191, 36, 0.1), transparent 24%),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.86), rgba(15, 23, 42, 0.58));
 }
 
-.statusSelect.unplaced {
-  border-left: 3px solid #ef4444;
-}
-
-/* =====================================
-   COMPANY INPUT
-   ===================================== */
-.companyInput {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--border-primary);
-  border-radius: 6px;
-  background: var(--input-bg);
-  color: var(--text-primary);
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-}
-
-.companyInput:focus {
-  outline: none;
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
-}
-
-/* =====================================
-   RESPONSIVENESS
-   ===================================== */
-@media (max-width: 768px) {
-  .contentContainer {
-    padding: 40px 15px;
-  }
-
-  .mainHeading {
-    font-size: 32px;
-  }
-
-  .filterSection {
+@media (max-width: 960px) {
+  .heroSection {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .filterCard {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .contentContainer {
+    width: min(100% - 20px, 1220px);
+    padding: 22px 0 36px;
+  }
+
+  .heroSection {
+    padding: 22px;
+    border-radius: 24px;
+  }
+
+  .companyCell {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .th,
   .td {
     padding: 12px;
-    font-size: 0.85rem;
   }
-
-  .table {
-    font-size: 0.85rem;
-  }
-
-  .studentEmail {
-    font-size: 0.75rem;
-  }
-}
-
-/* ===== CSS VARIABLES FOR THEMING ===== */
-
-/* DARK THEME (DEFAULT) */
-:root[data-theme='dark'] {
-  --page-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-  --card-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.6));
-  --text-primary: #e2e8f0;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --border-primary: rgba(217, 119, 6, 0.3);
-  --gradient-text: linear-gradient(135deg, #d97706, #f59e0b, #ec4899);
-  --card-shadow: 0 0 30px rgba(217, 119, 6, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  --accent-blue: #d97706;
-  --accent-purple: #f59e0b;
-  --input-bg: rgba(15, 23, 42, 0.4);
-}
-
-/* LIGHT THEME */
-:root[data-theme='light'] {
-  --page-bg: linear-gradient(135deg, #f8f9fa 0%, #f0f4f8 50%, #f8f9fa 100%);
-  --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.9));
-  --text-primary: #1f2937;
-  --text-secondary: #374151;
-  --text-muted: #6b7280;
-  --border-primary: rgba(180, 83, 9, 0.2);
-  --gradient-text: linear-gradient(135deg, #b45309, #d97706, #ec4899);
-  --card-shadow: 0 0 20px rgba(180, 83, 9, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  --accent-blue: #b45309;
-  --accent-purple: #d97706;
-  --input-bg: rgba(255, 255, 255, 0.6);
-}
-
-
-
-/* portal-landing-bg */
-.pageContainer {
-  background: var(--page-bg);
-  position: relative;
-  overflow-x: hidden;
-  isolation: isolate;
-}
-
-.pageContainer::before {
-  content: "";
-  position: absolute;
-  inset: -20%;
-  background:
-    radial-gradient(circle at 14% 18%, var(--accent-blue) 0%, transparent 42%),
-    radial-gradient(circle at 88% 12%, var(--accent-purple) 0%, transparent 40%),
-    radial-gradient(circle at 62% 88%, var(--accent-pink, var(--accent-purple)) 0%, transparent 44%);
-  opacity: 0.16;
-  z-index: -2;
-  pointer-events: none;
-}
-
-.pageContainer::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--border-primary) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border-primary) 1px, transparent 1px);
-  background-size: 36px 36px, 36px 36px;
-  background-position: center;
-  opacity: 0.35;
-  z-index: -1;
-  pointer-events: none;
 }

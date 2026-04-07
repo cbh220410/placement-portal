@@ -17,6 +17,19 @@ const getProfileCompletion = (profileData) => {
   return (completedFields / totalFields) * 100;
 };
 
+const formatInterviewSchedule = (interview) => {
+  if (interview?.interviewDate) {
+    return new Date(interview.interviewDate).toLocaleDateString();
+  }
+  if (interview?.date && interview?.time) {
+    return `${interview.date} at ${interview.time}`;
+  }
+  if (interview?.date) {
+    return interview.date;
+  }
+  return 'Schedule pending';
+};
+
 const StudentDashboard = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState({
@@ -177,9 +190,7 @@ const StudentDashboard = () => {
               <div className={styles.list}>
                 {stats.interviews.slice(0, 5).map((intv) => (
                   <div key={intv.id} className={styles.listItem}>
-                    <p className={styles.listTitle}>
-                      {new Date(intv.interviewDate).toLocaleDateString()}
-                    </p>
+                    <p className={styles.listTitle}>{formatInterviewSchedule(intv)}</p>
                     <p className={styles.listMeta}>Status: {intv.status}</p>
                   </div>
                 ))}

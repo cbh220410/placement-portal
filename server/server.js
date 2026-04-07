@@ -11,6 +11,62 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const padNumber = (value) => String(value).padStart(2, '0');
+
+const toDisplayTime = (timeValue) => {
+  if (!timeValue) return '';
+  if (/am|pm/i.test(timeValue)) return timeValue;
+
+  const [hourText = '00', minuteText = '00'] = String(timeValue).split(':');
+  const hour = Number(hourText);
+  const minute = Number(minuteText);
+  const suffix = hour >= 12 ? 'PM' : 'AM';
+  const normalizedHour = hour % 12 || 12;
+  return `${normalizedHour}:${padNumber(minute)} ${suffix}`;
+};
+
+const to24HourTime = (timeValue) => {
+  if (!timeValue) return '';
+
+  const trimmed = String(timeValue).trim();
+  if (!/am|pm/i.test(trimmed)) {
+    const [hourText = '00', minuteText = '00'] = trimmed.split(':');
+    return `${padNumber(Number(hourText))}:${padNumber(Number(minuteText))}`;
+  }
+
+  const match = trimmed.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return '';
+
+  let hour = Number(match[1]);
+  const minute = Number(match[2]);
+  const suffix = match[3].toUpperCase();
+
+  if (suffix === 'AM' && hour === 12) hour = 0;
+  if (suffix === 'PM' && hour !== 12) hour += 12;
+
+  return `${padNumber(hour)}:${padNumber(minute)}`;
+};
+
+const normalizeInterviewRecord = (interview) => {
+  const base = interview.toJSON ? interview.toJSON() : interview;
+  let resolvedDate = base.date || null;
+  let resolvedTime = base.time || null;
+
+  if ((!resolvedDate || !resolvedTime) && base.interviewDate) {
+    const parsed = new Date(base.interviewDate);
+    if (!Number.isNaN(parsed.getTime())) {
+      resolvedDate = resolvedDate || `${parsed.getFullYear()}-${padNumber(parsed.getMonth() + 1)}-${padNumber(parsed.getDate())}`;
+      resolvedTime = resolvedTime || toDisplayTime(`${padNumber(parsed.getHours())}:${padNumber(parsed.getMinutes())}`);
+    }
+  }
+
+  return {
+    ...base,
+    date: resolvedDate,
+    time: resolvedTime,
+  };
+};
+
 // --- Database Connection (MySQL with Sequelize) ---
 const sequelize = new Sequelize(
   process.env.DB_NAME || 'placementdb',
@@ -560,26 +616,50 @@ app.patch('/api/applications/:id/status', async (req, res) => {
 // --- Create interview ---
 app.post('/api/interviews', async (req, res) => {
   try {
-    const { applicationId, studentEmail, interviewDate } = req.body;
-    console.log('📅 New interview scheduled:', { applicationId, studentEmail });
-    
+    const { applicationId, studentEmail, interviewDate, date, time } = req.body;
+    console.log('Interview scheduling request:', { applicationId, studentEmail, date, time });
+
+    if (!applicationId) {
+      return res.status(400).json({ message: 'Application id is required' });
+    }
+
+    const application = await Application.findByPk(applicationId);
+    if (!application) {
+      return res.status(404).json({ message: 'Application not found' });
+    }
+
+    const resolvedStudentEmail = studentEmail || application.studentEmail;
+    const resolvedDate = date || (interviewDate ? interviewDate.slice(0, 10) : null);
+    const resolvedTime = time || (interviewDate ? toDisplayTime(interviewDate.slice(11, 16)) : null);
+
+    if (!resolvedStudentEmail || !resolvedDate || !resolvedTime) {
+      return res.status(400).json({ message: 'Date and time are required to schedule an interview' });
+    }
+
+    const normalizedInterviewDate = interviewDate || `${resolvedDate}T${to24HourTime(resolvedTime)}:00`;
+
     const newInterview = await Interview.create({
       applicationId,
-      studentEmail,
-      interviewDate,
+      studentEmail: resolvedStudentEmail,
+      interviewDate: normalizedInterviewDate,
       status: 'SCHEDULED'
     });
-    
+
+    application.status = 'INTERVIEW_SCHEDULED';
+    await application.save();
+
     res.status(201).json({
       id: newInterview.id,
       applicationId,
-      studentEmail,
-      interviewDate,
+      studentEmail: resolvedStudentEmail,
+      interviewDate: normalizedInterviewDate,
+      date: resolvedDate,
+      time: toDisplayTime(resolvedTime),
       status: newInterview.status,
       message: 'Interview scheduled successfully'
     });
   } catch (error) {
-    console.error('❌ Interview error:', error.message);
+    console.error('Interview error:', error.message);
     res.status(500).json({ message: 'Interview scheduling failed', error: error.message });
   }
 });
@@ -591,8 +671,8 @@ app.get('/api/interviews/student', async (req, res) => {
     if (!email) {
       return res.status(400).json({ message: 'Email query parameter required' });
     }
-    const interviews = await Interview.findAll({ where: { studentEmail: email } });
-    res.status(200).json(interviews);
+    const interviews = await Interview.findAll({ where: { studentEmail: email }, order: [['interviewDate', 'DESC']] });
+    res.status(200).json(interviews.map(normalizeInterviewRecord));
   } catch (error) {
     res.status(500).json({ message: 'Error fetching interviews', error: error.message });
   }
@@ -602,8 +682,8 @@ app.get('/api/interviews/student', async (req, res) => {
 app.get('/api/interviews/application/:applicationId', async (req, res) => {
   try {
     const { applicationId } = req.params;
-    const interviews = await Interview.findAll({ where: { applicationId } });
-    res.status(200).json(interviews);
+    const interviews = await Interview.findAll({ where: { applicationId }, order: [['interviewDate', 'DESC']] });
+    res.status(200).json(interviews.map(normalizeInterviewRecord));
   } catch (error) {
     res.status(500).json({ message: 'Error fetching interviews', error: error.message });
   }
@@ -928,3 +1008,4 @@ app.listen(PORT, () => {
   console.log(`👥 Students: http://localhost:${PORT}/api/students`);
   console.log(`👤 All Users: http://localhost:${PORT}/api/users`);
 });
+

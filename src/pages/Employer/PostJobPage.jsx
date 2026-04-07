@@ -11,6 +11,7 @@ const PostJobPage = () => {
 
   const [jobDetails, setJobDetails] = useState({
     title: "",
+    company: "",
     location: "",
     description: "",
     requirements: "",
@@ -29,7 +30,7 @@ const PostJobPage = () => {
     const newJob = {
       id: Date.now(),
       title: jobDetails.title,
-      company: user.name,
+      company: jobDetails.company,
       location: jobDetails.location,
       description: jobDetails.description,
       requirements: jobDetails.requirements,
@@ -41,6 +42,7 @@ const PostJobPage = () => {
     try {
       await createJob({
         title: jobDetails.title,
+        company: jobDetails.company,
         location: jobDetails.location,
         description: jobDetails.description,
         requirements: jobDetails.requirements,
@@ -59,6 +61,7 @@ const PostJobPage = () => {
 
     setJobDetails({
       title: "",
+      company: "",
       location: "",
       description: "",
       requirements: "",
@@ -89,8 +92,10 @@ const PostJobPage = () => {
               <label className={styles.label}>Company</label>
               <input
                 type="text"
-                value={user.name}
-                disabled
+                name="company"
+                value={jobDetails.company}
+                onChange={handleChange}
+                required
                 className={styles.input}
               />
             </div>

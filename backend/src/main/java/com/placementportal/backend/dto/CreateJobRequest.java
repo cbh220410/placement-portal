@@ -9,6 +9,10 @@ public class CreateJobRequest {
     @Size(max = 140, message = "Title must be at most 140 characters")
     private String title;
 
+    @NotBlank(message = "Company is required")
+    @Size(max = 140, message = "Company must be at most 140 characters")
+    private String company;
+
     @NotBlank(message = "Location is required")
     @Size(max = 120, message = "Location must be at most 120 characters")
     private String location;
@@ -30,6 +34,14 @@ public class CreateJobRequest {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 
     public String getLocation() {

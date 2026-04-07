@@ -81,7 +81,7 @@ const OfficerDashboard = () => {
     {
       title: 'Track applications',
       description: 'Use the status summary to spot movement or bottlenecks.',
-      action: () => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }),
+      action: () => navigate('/officer/student-status'),
     },
   ];
 

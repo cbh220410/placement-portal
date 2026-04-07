@@ -5,6 +5,7 @@ import com.placementportal.backend.model.Job;
 import com.placementportal.backend.service.JobService;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +40,12 @@ public class JobController {
     @GetMapping("/{id}")
     public Job getById(@PathVariable Long id) {
         return jobService.getById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        jobService.deleteJob(id);
     }
 
     @GetMapping("/employer")

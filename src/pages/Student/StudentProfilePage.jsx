@@ -1,27 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import StudentNavbar from './StudentNavbar';
-import { useAuth } from '../../context/AuthContext'; // Import useAuth
+import { useAuth } from '../../context/AuthContext';
 import { fetchUserByEmail, isBackendUnavailable, updateStudentProfile as updateStudentProfileApi } from '../../services/portalApi';
 import styles from './StudentProfilePage.module.css';
 
-const StudentProfilePage = () => {
-  const { user } = useAuth(); // Get the current logged-in user object
+const normalizeResumeLink = (value) => {
+  const trimmed = value?.trim() || '';
+  if (!trimmed) return '';
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+};
 
-  // Initialize state with the logged-in user's actual data
+const StudentProfilePage = () => {
+  const { user, updateUser } = useAuth();
+  const [backendUserId, setBackendUserId] = useState(user?.id || null);
   const [profile, setProfile] = useState({
     name: user.name || '',
-    email: user.email || '', // CRITICAL: Use actual email
+    email: user.email || '',
     resume: null,
-    skills: 'React, JavaScript, CSS', // Default values for fields not on signup
+    skills: 'React, JavaScript, CSS',
     bio: 'Motivated student seeking opportunities in web development.',
   });
   const [loading, setLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
       setLoading(true);
       try {
         const backendProfile = await fetchUserByEmail(user.email);
+        setBackendUserId(backendProfile.id || null);
         setProfile((prev) => ({
           ...prev,
           name: backendProfile.name || prev.name,
@@ -47,31 +57,47 @@ const StudentProfilePage = () => {
     setProfile(prevProfile => ({ ...prevProfile, [name]: value }));
   };
 
-  const handleResumeUpload = (e) => {
-    if (e.target.files[0]) {
-      setProfile(prevProfile => ({ ...prevProfile, resume: e.target.files[0].name }));
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
     try {
-      if (user.id) {
-        await updateStudentProfileApi(user.id, {
-          name: profile.name,
-          skills: profile.skills,
-          bio: profile.bio,
-          resume: profile.resume,
-        });
+      const userIdToUpdate = backendUserId || user.id;
+      if (!userIdToUpdate) {
+        throw new Error('Profile id not available. Please log out and log in again.');
       }
+
+      const updatedProfile = await updateStudentProfileApi(userIdToUpdate, {
+        name: profile.name,
+        skills: profile.skills,
+        bio: profile.bio,
+        resume: normalizeResumeLink(profile.resume),
+      });
+
+      setBackendUserId(updatedProfile.id || userIdToUpdate);
+      setProfile((prev) => ({
+        ...prev,
+        name: updatedProfile.name || prev.name,
+        email: updatedProfile.email || prev.email,
+        skills: updatedProfile.skills || '',
+        bio: updatedProfile.bio || '',
+        resume: updatedProfile.resume || null,
+      }));
+      updateUser({
+        id: updatedProfile.id || userIdToUpdate,
+        name: updatedProfile.name || profile.name,
+        email: updatedProfile.email || profile.email,
+      });
     } catch (error) {
-      if (!isBackendUnavailable(error)) {
+      if (isBackendUnavailable(error)) {
+        alert('Backend not reachable. Profile changes were not saved.');
+      } else {
         alert(error.message || 'Failed to update profile');
-        return;
       }
+      setIsSaving(false);
+      return;
     }
     alert('Profile updated successfully!');
-    console.log('Profile saved:', profile);
+    setIsSaving(false);
   };
 
   return (
@@ -99,7 +125,7 @@ const StudentProfilePage = () => {
               <input
                 type="email"
                 name="email"
-                value={profile.email} // Displays the actual logged-in user's email
+                value={profile.email}
                 onChange={handleChange}
                 disabled
                 className={styles.input}
@@ -126,16 +152,31 @@ const StudentProfilePage = () => {
               ></textarea>
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Upload Resume</label>
+              <label className={styles.label}>Resume Link</label>
               <input
-                type="file"
-                onChange={handleResumeUpload}
-                className={styles.fileInput}
+                type="url"
+                name="resume"
+                value={profile.resume || ''}
+                onChange={handleChange}
+                placeholder="Paste your Google Drive or resume URL"
+                className={styles.input}
               />
-              {profile.resume && <p className={styles.fileName}>File: {profile.resume}</p>}
+              <p className={styles.helperText}>
+                Paste a public Google Drive, OneDrive, or direct resume link so employers can open it.
+              </p>
+              {profile.resume ? (
+                <a
+                  href={normalizeResumeLink(profile.resume)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.resumePreviewLink}
+                >
+                  Preview current resume link
+                </a>
+              ) : null}
             </div>
-            <button type="submit" className={styles.button}>
-              Save Profile
+            <button type="submit" className={styles.button} disabled={isSaving}>
+              {isSaving ? 'Saving...' : 'Save Profile'}
             </button>
           </form>
         </div>

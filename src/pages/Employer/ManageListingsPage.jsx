@@ -14,32 +14,25 @@ const ManageListingsPage = () => {
 
   const loadJobs = async () => {
     setIsRefreshing(true);
-    console.log('🔄 Loading jobs for employer:', user.email);
     try {
       const myJobs = await fetchEmployerJobs(user.email);
-      console.log('✅ Fetched jobs from backend:', myJobs);
       setJobs(myJobs);
       setIsRefreshing(false);
       return;
     } catch (error) {
-      console.error('❌ Backend error:', error.message);
       if (!isBackendUnavailable(error)) {
         console.error("Failed to load employer jobs:", error);
       }
     }
 
-    console.log('📦 Falling back to localStorage');
     const allJobs = getTable("jobs");
-    console.log('All jobs in localStorage:', allJobs);
     const myJobs = allJobs.filter((job) => job.employerEmail === user.email);
-    console.log('Filtered jobs for this employer:', myJobs);
     setJobs(myJobs);
     setIsRefreshing(false);
   };
 
   useEffect(() => {
     loadJobs();
-    // Auto-refresh every 5 seconds
     const interval = setInterval(loadJobs, 5000);
     return () => clearInterval(interval);
   }, [user.email]);
@@ -48,26 +41,14 @@ const ManageListingsPage = () => {
     <div className={styles.pageContainer}>
       <EmployerNavbar />
       <div className={styles.contentContainer}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <div className={styles.toolbar}>
           <h1 className={styles.mainHeading}>Manage Job Listings</h1>
-          <button 
-            onClick={loadJobs} 
-            disabled={isRefreshing}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: isRefreshing ? 'not-allowed' : 'pointer',
-              opacity: isRefreshing ? 0.6 : 1
-            }}
-          >
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+          <button onClick={loadJobs} disabled={isRefreshing} className={styles.refreshButton}>
+            {isRefreshing ? "Refreshing..." : "Refresh"}
           </button>
         </div>
 
-        {jobs.length === 0 && <p>No jobs posted yet.</p>}
+        {jobs.length === 0 && <p className={styles.emptyState}>No jobs posted yet.</p>}
 
         {jobs.length > 0 && (
           <table className={styles.table}>
